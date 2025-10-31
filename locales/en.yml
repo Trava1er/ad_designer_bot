@@ -1,0 +1,225 @@
+# English localization for AdDesigner Hub bot
+
+# Main menu
+menu:
+  submit_ad: "📝 Submit Ad"
+  my_ads: "📋 My Ads"
+  tariffs: "💰 Pricing"
+  help: "❓ Help"
+  back: "🔙 Back"
+  cancel: "❌ Cancel"
+  continue: "▶️ Continue"
+  edit: "📝 Edit"
+  approve: "✅ Approve"
+  reject: "❌ Reject"
+
+# Welcome messages
+welcome:
+  start: |
+    🎉 Welcome to AdDesigner Hub!
+    
+    Here you can create and publish advertisements with AI assistance.
+    
+    Choose an action:
+  language_selected: "✅ English language selected"
+  choose_language: "🌐 Choose language:"
+
+# Ad creation flow
+ad_creation:
+  choose_channel: "📢 Choose channel for posting:"
+  choose_text_method: |
+    📝 How to create ad text?
+    
+    • Use your text - enter ready text
+    • Generate from description - answer a few questions and AI will create text
+  use_own_text: "📄 Use my text"
+  generate_from_description: "🤖 Generate from description"
+  
+  # Text input
+  enter_text: "📝 Enter ad text (maximum 4000 characters):"
+  text_too_long: "⚠️ Text too long. Maximum 4000 characters."
+  
+  # AI generation questions
+  question_what: "🎯 What do you offer? (product/service)"
+  question_for_whom: "👥 For whom? (target audience)"
+  question_benefits: "✨ What benefits? (what will customer get)"
+  question_contacts: "📞 Contacts (how to reach you)"
+  question_price: "💰 Price (if any, or write 'negotiable')"
+  
+  # Text preview
+  text_preview: |
+    📋 Text preview:
+    
+    {text}
+    
+    What's next?
+  generating_text: "🤖 Generating ad text..."
+  generation_failed: "❌ Failed to generate text. Try entering manually."
+  
+  # Media selection
+  choose_media: |
+    🖼 Add media to the ad?
+    
+    • Generate image - AI will create picture from text
+    • Upload files - attach your photos/videos
+    • No media - text only
+  generate_image: "🎨 Generate image"
+  upload_media: "📎 Upload files"
+  no_media: "📄 No media"
+  
+  generating_image: "🎨 Generating image..."
+  image_generated: "✅ Image generated!"
+  image_generation_failed: "❌ Failed to generate image"
+  
+  upload_files: "📎 Upload photos or videos (up to 10 files):"
+  upload_complete: "📎 Upload more files"
+  files_uploaded: "✅ Files uploaded: {count}"
+  max_files_exceeded: "⚠️ Maximum 10 files"
+  
+  # Final preview
+  final_preview: |
+    📋 Final ad:
+    
+    🏢 Channel: {channel}
+    📝 Text: {text}
+    📎 Media: {media_count} files
+    
+    Continue to pricing selection?
+
+# Tariffs
+tariffs:
+  choose_tariff: "💰 Choose pricing plan:"
+  single_post: "📄 Single post"
+  package_5: "📦 5 posts package"
+  package_10: "📦 10 posts package"
+  subscription: "🔄 Subscription (30 days)"
+  
+  details: |
+    💰 Plan: {name}
+    📊 Posts: {posts}
+    📅 Period: {period}
+    💵 Price: {price}
+
+# Payment
+payment:
+  choose_currency: "💱 Choose currency:"
+  currency_rub: "₽ Rubles (RUB)"
+  currency_usd: "$ Dollars (USD)"
+  currency_usdt: "₮ USDT (cryptocurrency)"
+  
+  creating_invoice: "💳 Creating payment invoice..."
+  invoice_created: |
+    💳 Invoice created!
+    
+    💰 Amount: {amount}
+    💱 Currency: {currency}
+    📋 Description: {description}
+    
+    Click button below to pay:
+  pay_button: "💳 Pay"
+  
+  payment_success: "✅ Payment successful! Ad sent for moderation."
+  payment_failed: "❌ Payment failed. Please try again."
+  payment_cancelled: "⏹ Payment cancelled"
+  
+# My ads
+my_ads:
+  title: "📋 Your ads:"
+  empty: "📝 You don't have any ads yet"
+  
+  status_draft: "📝 Draft"
+  status_waiting_payment: "💳 Awaiting payment"
+  status_waiting_moderation: "⏳ Under review"
+  status_approved: "✅ Approved"
+  status_rejected: "❌ Rejected"
+  status_published: "📢 Published"
+  
+  ad_item: |
+    🆔 #{id}
+    📊 Status: {status}
+    📅 Created: {created}
+    📝 Text: {text_preview}...
+  
+  ad_details: |
+    🆔 Ad #{id}
+    
+    📊 Status: {status}
+    🏢 Channel: {channel}
+    📅 Created: {created}
+    💰 Plan: {tariff}
+    
+    📝 Text:
+    {text}
+  
+  rejected_reason: |
+    ❌ Rejection reason:
+    {reason}
+
+# Admin panel
+admin:
+  new_ad_notification: |
+    🔔 New ad for moderation!
+    
+    👤 User: {user}
+    🆔 ID: {ad_id}
+    🏢 Channel: {channel}
+    💰 Paid: {amount} {currency}
+    
+    📝 Text:
+    {text}
+  
+  moderation_panel: |
+    🔍 Moderating ad #{ad_id}
+    
+    Choose action:
+  
+  approve_success: "✅ Ad approved and published"
+  reject_reason: "❌ Enter rejection reason:"
+  reject_success: "❌ Ad rejected"
+  
+  edit_text: "📝 Enter new text:"
+  edit_success: "✅ Text edited"
+
+# Help
+help:
+  text: |
+    ❓ Bot usage help
+    
+    🤖 AdDesigner Hub is a bot for creating and publishing advertisements with artificial intelligence.
+    
+    📝 How to create an ad:
+    1. Press "Submit Ad"
+    2. Choose posting channel
+    3. Create text (yourself or with AI)
+    4. Add media (optional)
+    5. Choose plan and pay
+    6. Wait for moderation
+    
+    💰 Pricing:
+    • Single post - one-time posting
+    • Packages - multiple posts with discount
+    • Subscription - many posts per month
+    
+    💳 Payment:
+    • Rubles - via YooKassa
+    • Dollars - via Stripe
+    • USDT - cryptocurrency
+    
+    📞 Support: @support_username
+
+# Errors
+errors:
+  unknown_command: "❓ Unknown command"
+  error_occurred: "❌ An error occurred. Try later."
+  access_denied: "🚫 Access denied"
+  user_banned: "🚫 You are banned"
+  
+# Common
+common:
+  yes: "✅ Yes"
+  no: "❌ No"
+  loading: "⏳ Loading..."
+  success: "✅ Success"
+  error: "❌ Error"
+  warning: "⚠️ Warning"
+  info: "ℹ️ Information"

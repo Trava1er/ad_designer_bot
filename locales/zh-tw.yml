@@ -1,0 +1,225 @@
+# Traditional Chinese localization for AdDesigner Hub bot
+
+# Main menu
+menu:
+  submit_ad: "📝 提交廣告"
+  my_ads: "📋 我的廣告"
+  tariffs: "💰 價格方案"
+  help: "❓ 幫助"
+  back: "🔙 返回"
+  cancel: "❌ 取消"
+  continue: "▶️ 繼續"
+  edit: "📝 編輯"
+  approve: "✅ 批准"
+  reject: "❌ 拒絕"
+
+# Welcome messages
+welcome:
+  start: |
+    🎉 歡迎來到 AdDesigner Hub！
+    
+    在這裡您可以使用人工智慧創建和發布廣告。
+    
+    請選擇操作：
+  language_selected: "✅ 已選擇繁體中文"
+  choose_language: "🌐 選擇語言："
+
+# Ad creation flow
+ad_creation:
+  choose_channel: "📢 選擇發布頻道："
+  choose_text_method: |
+    📝 如何創建廣告文字？
+    
+    • 使用我的文字 - 輸入已準備好的文字
+    • 從描述生成 - 回答幾個問題，AI將創建文字
+  use_own_text: "📄 使用我的文字"
+  generate_from_description: "🤖 從描述生成"
+  
+  # Text input
+  enter_text: "📝 輸入廣告文字（最多4000個字符）："
+  text_too_long: "⚠️ 文字太長。最多4000個字符。"
+  
+  # AI generation questions
+  question_what: "🎯 您提供什麼？（產品/服務）"
+  question_for_whom: "👥 針對誰？（目標受眾）"
+  question_benefits: "✨ 有什麼好處？（客戶會得到什麼）"
+  question_contacts: "📞 聯繫方式（如何聯繫您）"
+  question_price: "💰 價格（如有，或寫'面議'）"
+  
+  # Text preview
+  text_preview: |
+    📋 文字預覽：
+    
+    {text}
+    
+    下一步做什麼？
+  generating_text: "🤖 正在生成廣告文字..."
+  generation_failed: "❌ 生成文字失敗。請嘗試手動輸入。"
+  
+  # Media selection
+  choose_media: |
+    🖼 為廣告添加媒體？
+    
+    • 生成圖片 - AI將根據文字創建圖片
+    • 上傳文件 - 附加您的照片/視頻
+    • 無媒體 - 僅文字
+  generate_image: "🎨 生成圖片"
+  upload_media: "📎 上傳文件"
+  no_media: "📄 無媒體"
+  
+  generating_image: "🎨 正在生成圖片..."
+  image_generated: "✅ 圖片已生成！"
+  image_generation_failed: "❌ 生成圖片失敗"
+  
+  upload_files: "📎 上傳照片或視頻（最多10個文件）："
+  upload_complete: "📎 上傳更多文件"
+  files_uploaded: "✅ 已上傳文件：{count}"
+  max_files_exceeded: "⚠️ 最多10個文件"
+  
+  # Final preview
+  final_preview: |
+    📋 最終廣告：
+    
+    🏢 頻道：{channel}
+    📝 文字：{text}
+    📎 媒體：{media_count}個文件
+    
+    繼續選擇價格方案？
+
+# Tariffs
+tariffs:
+  choose_tariff: "💰 選擇價格方案："
+  single_post: "📄 單次發布"
+  package_5: "📦 5次發布套餐"
+  package_10: "📦 10次發布套餐"
+  subscription: "🔄 訂閱（30天）"
+  
+  details: |
+    💰 方案：{name}
+    📊 發布次數：{posts}
+    📅 期間：{period}
+    💵 價格：{price}
+
+# Payment
+payment:
+  choose_currency: "💱 選擇貨幣："
+  currency_rub: "₽ 盧布（RUB）"
+  currency_usd: "$ 美元（USD）"
+  currency_usdt: "₮ USDT（加密貨幣）"
+  
+  creating_invoice: "💳 正在創建付款發票..."
+  invoice_created: |
+    💳 發票已創建！
+    
+    💰 金額：{amount}
+    💱 貨幣：{currency}
+    📋 描述：{description}
+    
+    點擊下方按鈕付款：
+  pay_button: "💳 付款"
+  
+  payment_success: "✅ 付款成功！廣告已發送審核。"
+  payment_failed: "❌ 付款失敗。請重試。"
+  payment_cancelled: "⏹ 付款已取消"
+  
+# My ads
+my_ads:
+  title: "📋 您的廣告："
+  empty: "📝 您還沒有任何廣告"
+  
+  status_draft: "📝 草稿"
+  status_waiting_payment: "💳 等待付款"
+  status_waiting_moderation: "⏳ 審核中"
+  status_approved: "✅ 已批准"
+  status_rejected: "❌ 已拒絕"
+  status_published: "📢 已發布"
+  
+  ad_item: |
+    🆔 #{id}
+    📊 狀態：{status}
+    📅 創建：{created}
+    📝 文字：{text_preview}...
+  
+  ad_details: |
+    🆔 廣告 #{id}
+    
+    📊 狀態：{status}
+    🏢 頻道：{channel}
+    📅 創建：{created}
+    💰 方案：{tariff}
+    
+    📝 文字：
+    {text}
+  
+  rejected_reason: |
+    ❌ 拒絕原因：
+    {reason}
+
+# Admin panel
+admin:
+  new_ad_notification: |
+    🔔 新廣告待審核！
+    
+    👤 用戶：{user}
+    🆔 ID：{ad_id}
+    🏢 頻道：{channel}
+    💰 已付款：{amount} {currency}
+    
+    📝 文字：
+    {text}
+  
+  moderation_panel: |
+    🔍 審核廣告 #{ad_id}
+    
+    選擇操作：
+  
+  approve_success: "✅ 廣告已批准並發布"
+  reject_reason: "❌ 輸入拒絕原因："
+  reject_success: "❌ 廣告已拒絕"
+  
+  edit_text: "📝 輸入新文字："
+  edit_success: "✅ 文字已編輯"
+
+# Help
+help:
+  text: |
+    ❓ 機器人使用幫助
+    
+    🤖 AdDesigner Hub 是一個使用人工智慧創建和發布廣告的機器人。
+    
+    📝 如何創建廣告：
+    1. 按「提交廣告」
+    2. 選擇發布頻道
+    3. 創建文字（自己或使用AI）
+    4. 添加媒體（可選）
+    5. 選擇方案並付款
+    6. 等待審核
+    
+    💰 價格：
+    • 單次發布 - 一次性發布
+    • 套餐 - 多次發布有折扣
+    • 訂閱 - 每月多次發布
+    
+    💳 付款：
+    • 盧布 - 通過YooKassa
+    • 美元 - 通過Stripe
+    • USDT - 加密貨幣
+    
+    📞 支持：@support_username
+
+# Errors
+errors:
+  unknown_command: "❓ 未知命令"
+  error_occurred: "❌ 發生錯誤。請稍後再試。"
+  access_denied: "🚫 拒絕訪問"
+  user_banned: "🚫 您已被禁止"
+  
+# Common
+common:
+  yes: "✅ 是"
+  no: "❌ 否"
+  loading: "⏳ 載入中..."
+  success: "✅ 成功"
+  error: "❌ 錯誤"
+  warning: "⚠️ 警告"
+  info: "ℹ️ 信息"

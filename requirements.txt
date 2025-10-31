@@ -1,0 +1,47 @@
+# Core Telegram bot framework
+aiogram
+
+# Configuration management
+pydantic-settings
+
+# Database ORM
+SQLAlchemy
+alembic
+
+# AI Services
+openai
+Pillow
+
+# Payment providers
+yookassa
+stripe
+requests
+
+# PDF generation
+reportlab
+
+# YAML support
+PyYAML
+
+# Async HTTP client
+aiohttp
+aiofiles
+
+# Environment variables
+python-dotenv
+
+# Date and time utilities
+python-dateutil
+
+# Type hints
+typing-extensions
+
+# Cryptography for secure tokens
+cryptography
+
+# Development dependencies (optional)
+# pytest
+# pytest-asyncio
+# black
+# mypy
+# flake8
