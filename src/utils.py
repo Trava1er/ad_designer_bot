@@ -543,24 +543,24 @@ def get_tariff_selection_keyboard(language: str = "ru", currency: str = "RUB") -
     
     builder = ReplyKeyboardBuilder()
     
-    # Web App URL (update this to your GitHub Pages URL)
-    webapp_url = "https://trava1er.github.io/ad_designer_bot/tariffs_new.html"
+    # Web App URL with language parameter
+    webapp_url = f"https://trava1er.github.io/ad_designer_bot/tariffs_new.html?lang={language}"
     
     if language == "ru":
         builder.row(KeyboardButton(
-            text="� Выбрать тариф и оплатить",
+            text="💰 Выбрать тариф и оплатить",
             web_app=WebAppInfo(url=webapp_url)
         ))
         builder.row(KeyboardButton(text="🏠 Главное меню"))
     elif language == "en":
         builder.row(KeyboardButton(
-            text="� Choose plan and pay",
+            text="💰 Choose plan and pay",
             web_app=WebAppInfo(url=webapp_url)
         ))
         builder.row(KeyboardButton(text="🏠 Main Menu"))
     else:  # zh-tw
         builder.row(KeyboardButton(
-            text="� 選擇方案並付款",
+            text="💰 選擇方案並付款",
             web_app=WebAppInfo(url=webapp_url)
         ))
         builder.row(KeyboardButton(text="🏠 主選單"))
