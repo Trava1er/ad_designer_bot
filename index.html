@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tariffs - Design Ads Bot</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --tg-theme-bg-color: #ffffff;
+            --tg-theme-text-color: #000000;
+            --tg-theme-hint-color: #999999;
+            --tg-theme-link-color: #2481cc;
+            --tg-theme-button-color: #2481cc;
+            --tg-theme-button-text-color: #ffffff;
+            --primary-color: #2B5278;
+            --accent-color: #FF6B6B;
+            --success-color: #51CF66;
+            --bg-light: #F8F9FA;
+            --border-color: #E9ECEF;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 16px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding: 16px 0;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 16px;
+            background: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .tariff-grid {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .tariff-card {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tariff-card:active {
+            transform: scale(0.98);
+        }
+
+        .tariff-card.highlight {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(43, 82, 120, 0.1);
+        }
+
+        .badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--success-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge.hot {
+            background: var(--accent-color);
+        }
+
+        .tariff-header {
+            margin-bottom: 16px;
+        }
+
+        .tariff-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .tariff-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .tariff-subtitle {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .tariff-price {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .price-main {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .price-currency {
+            font-size: 18px;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .price-old {
+            font-size: 16px;
+            color: var(--tg-theme-hint-color);
+            text-decoration: line-through;
+        }
+
+        .save-badge {
+            display: inline-block;
+            background: var(--success-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .tariff-features {
+            list-style: none;
+            margin: 16px 0;
+        }
+
+        .tariff-features li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: var(--tg-theme-text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tariff-features li:before {
+            content: "✓";
+            color: var(--success-color);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .select-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .select-btn:active {
+            transform: scale(0.95);
+            opacity: 0.8;
+        }
+
+        .currency-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .currency-btn {
+            padding: 8px 16px;
+            background: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .currency-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            background: var(--bg-light);
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--tg-theme-hint-color);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .footer-note {
+            text-align: center;
+            padding: 20px;
+            color: var(--tg-theme-hint-color);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Тарифы</h1>
+            <p>Выберите подходящий вариант</p>
+        </div>
+
+        <div class="currency-selector">
+            <button class="currency-btn active" data-currency="rub">₽ RUB</button>
+            <button class="currency-btn" data-currency="usd">$ USD</button>
+            <button class="currency-btn" data-currency="usdt">₮ USDT</button>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="onetime">Разовые</div>
+            <div class="tab" data-tab="subscription">Подписки</div>
+            <div class="tab" data-tab="comparison">Сравнение</div>
+        </div>
+
+        <!-- One-time purchases -->
+        <div class="tab-content active" id="onetime">
+            <div class="tariff-grid">
+                <div class="tariff-card" data-plan="pack1">
+                    <div class="tariff-header">
+                        <div class="tariff-icon">📦</div>
+                        <div class="tariff-title">1 объявление</div>
+                        <div class="tariff-subtitle">Попробуйте сервис</div>
+                    </div>
+                    <div class="tariff-price">
+                        <span class="price-main" data-price-rub="200" data-price-usd="3" data-price-usdt="3">200</span>
+                        <span class="price-currency">₽</span>
+                    </div>
+                    <ul class="tariff-features">
+                        <li>AI улучшение текста</li>
+                        <li>Размещение в каналах</li>
+                        <li>Статистика показов</li>
+                    </ul>
+                    <button class="select-btn" onclick="selectPlan('pack1', this)">Выбрать</button>
+                </div>
+
+                <div class="tariff-card" data-plan="pack5">
+                    <div class="tariff-header">
+                        <div class="tariff-icon">📦</div>
+                        <div class="tariff-title">5 объявлений</div>
+                        <div class="tariff-subtitle">Небольшой запас</div>
+                    </div>
+                    <div class="tariff-price">
+                        <span class="price-main" data-price-rub="900" data-price-usd="13" data-price-usdt="13">900</span>
+                        <span class="price-currency">₽</span>
+                        <span class="save-badge">-10%</span>
+                    </div>
+                    <ul class="tariff-features">
+                        <li>AI улучшение текста</li>
+                        <li>Размещение в каналах</li>
+                        <li>Статистика показов</li>
+                    </ul>
+                    <button class="select-btn" onclick="selectPlan('pack5', this)">Выбрать</button>
+                </div>
+
+                <div class="tariff-card highlight" data-plan="pack10">
+                    <div class="badge">Популярно</div>
+                    <div class="tariff-header">
+                        <div class="tariff-icon">📦</div>
+                        <div class="tariff-title">10 объявлений</div>
+                        <div class="tariff-subtitle">Оптимальный выбор</div>
+                    </div>
+                    <div class="tariff-price">
+                        <span class="price-main" data-price-rub="1600" data-price-usd="24" data-price-usdt="24">1600</span>
+                        <span class="price-currency">₽</span>
+                        <span class="save-badge">-20%</span>
+                    </div>
+                    <ul class="tariff-features">
+                        <li>AI улучшение текста</li>
+                        <li>Размещение в каналах</li>
+                        <li>Статистика показов</li>
+                    </ul>
+                    <button class="select-btn" onclick="selectPlan('pack10', this)">Выбрать</button>
+                </div>
+
+                <div class="tariff-card" data-plan="pack20">
+                    <div class="badge hot">🔥 Выгодно</div>
+                    <div class="tariff-header">
+                        <div class="tariff-icon">🔥</div>
+                        <div class="tariff-title">20 объявлений</div>
+                        <div class="tariff-subtitle">Активное продвижение</div>
+                    </div>
+                    <div class="tariff-price">
+                        <span class="price-main" data-price-rub="3000" data-price-usd="45" data-price-usdt="45">3000</span>
+                        <span class="price-currency">₽</span>
+                        <span class="save-badge">-25%</span>
+                    </div>
+                    <ul class="tariff-features">
+                        <li>AI улучшение текста</li>
+                        <li>Размещение в каналах</li>
+                        <li>Статистика показов</li>
+                    </ul>
+                    <button class="select-btn" onclick="selectPlan('pack20', this)">Выбрать</button>
+                </div>
+
+                <div class="tariff-card" data-plan="pack30">
+                    <div class="badge hot">🔥 Максимум</div>
+                    <div class="tariff-header">
+                        <div class="tariff-icon">🔥</div>
+                        <div class="tariff-title">30 объявлений</div>
+                        <div class="tariff-subtitle">Максимальная выгода</div>
+                    </div>
+                    <div class="tariff-price">
+                        <span class="price-main" data-price-rub="4200" data-price-usd="63" data-price-usdt="63">4200</span>
+                        <span class="price-currency">₽</span>
+                        <span class="save-badge">-30%</span>
+                    </div>
+                    <ul class="tariff-features">
+                        <li>AI улучшение текста</li>
+                        <li>Размещение в каналах</li>
+                        <li>Статистика показов</li>
+                    </ul>
+                    <button class="select-btn" onclick="selectPlan('pack30', this)">Выбрать</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscriptions -->
+        <div class="tab-content" id="subscription">
+            <div class="tariff-grid">
+                <div class="tariff-card" data-plan="week">
+                    <div class="tariff-header">
+                        <div class="tariff-icon">⭐</div>
+                        <div class="tariff-title">1 неделя</div>
+                        <div class="tariff-subtitle">Безлимит объявлений</div>
+                    </div>
+                    <div class="tariff-price">
+                        <span class="price-main" data-price-rub="800" data-price-usd="12" data-price-usdt="12">800</span>
+                        <span class="price-currency">₽</span>
+                    </div>
+                    <ul class="tariff-features">
+                        <li>Безлимит объявлений</li>
+                        <li>AI улучшение текста</li>
+                        <li>Размещение в каналах</li>
+                        <li>Статистика показов</li>
+                    </ul>
+                    <button class="select-btn" onclick="selectPlan('week', this)">Выбрать</button>
+                </div>
+
+                <div class="tariff-card highlight" data-plan="month">
+                    <div class="badge">Выгодно</div>
+                    <div class="tariff-header">
+                        <div class="tariff-icon">⭐</div>
+                        <div class="tariff-title">1 месяц</div>
+                        <div class="tariff-subtitle">Безлимит объявлений</div>
+                    </div>
+                    <div class="tariff-price">
+                        <span class="price-main" data-price-rub="2500" data-price-usd="37" data-price-usdt="37">2500</span>
+                        <span class="price-currency">₽</span>
+                        <span class="save-badge">-22%</span>
+                    </div>
+                    <ul class="tariff-features">
+                        <li>Безлимит объявлений</li>
+                        <li>AI улучшение текста</li>
+                        <li>Размещение в каналах</li>
+                        <li>Статистика показов</li>
+                    </ul>
+                    <button class="select-btn" onclick="selectPlan('month', this)">Выбрать</button>
+                </div>
+
+                <div class="tariff-card" data-plan="quarter">
+                    <div class="badge hot">🔥 Супер</div>
+                    <div class="tariff-header">
+                        <div class="tariff-icon">⭐</div>
+                        <div class="tariff-title">3 месяца</div>
+                        <div class="tariff-subtitle">Безлимит объявлений</div>
+                    </div>
+                    <div class="tariff-price">
+                        <span class="price-main" data-price-rub="6000" data-price-usd="90" data-price-usdt="90">6000</span>
+                        <span class="price-currency">₽</span>
+                        <span class="save-badge">-37%</span>
+                    </div>
+                    <ul class="tariff-features">
+                        <li>Безлимит объявлений</li>
+                        <li>AI улучшение текста</li>
+                        <li>Размещение в каналах</li>
+                        <li>Статистика показов</li>
+                    </ul>
+                    <button class="select-btn" onclick="selectPlan('quarter', this)">Выбрать</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison -->
+        <div class="tab-content" id="comparison">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Тариф</th>
+                        <th>Объявления</th>
+                        <th>RUB</th>
+                        <th>USD</th>
+                        <th>USDT</th>
+                        <th>Скидка</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>📦 1 объявление</td>
+                        <td>1</td>
+                        <td>200₽</td>
+                        <td>$3</td>
+                        <td>3₮</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>📦 5 объявлений</td>
+                        <td>5</td>
+                        <td>900₽</td>
+                        <td>$13</td>
+                        <td>13₮</td>
+                        <td style="color: var(--success-color); font-weight: 700;">-10%</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td><strong>📦 10 объявлений</strong></td>
+                        <td><strong>10</strong></td>
+                        <td><strong>1600₽</strong></td>
+                        <td><strong>$24</strong></td>
+                        <td><strong>24₮</strong></td>
+                        <td style="color: var(--success-color); font-weight: 700;">-20%</td>
+                    </tr>
+                    <tr>
+                        <td>🔥 20 объявлений</td>
+                        <td>20</td>
+                        <td>3000₽</td>
+                        <td>$45</td>
+                        <td>45₮</td>
+                        <td style="color: var(--success-color); font-weight: 700;">-25%</td>
+                    </tr>
+                    <tr>
+                        <td>🔥 30 объявлений</td>
+                        <td>30</td>
+                        <td>4200₽</td>
+                        <td>$63</td>
+                        <td>63₮</td>
+                        <td style="color: var(--success-color); font-weight: 700;">-30%</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td colspan="6" style="text-align: center; padding: 16px; font-weight: 700;">ПОДПИСКИ (Безлимит)</td>
+                    </tr>
+                    <tr>
+                        <td>⭐ 1 неделя</td>
+                        <td>∞</td>
+                        <td>800₽</td>
+                        <td>$12</td>
+                        <td>12₮</td>
+                        <td>—</td>
+                    </tr>
+                    <tr style="background: var(--bg-light);">
+                        <td><strong>⭐ 1 месяц</strong></td>
+                        <td><strong>∞</strong></td>
+                        <td><strong>2500₽</strong></td>
+                        <td><strong>$37</strong></td>
+                        <td><strong>37₮</strong></td>
+                        <td style="color: var(--success-color); font-weight: 700;">-22%</td>
+                    </tr>
+                    <tr>
+                        <td>⭐ 3 месяца</td>
+                        <td>∞</td>
+                        <td>6000₽</td>
+                        <td>$90</td>
+                        <td>90₮</td>
+                        <td style="color: var(--success-color); font-weight: 700;">-37%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-note">
+            Все тарифы включают:<br>
+            ✓ AI улучшение текста<br>
+            ✓ Размещение в каналах<br>
+            ✓ Статистика показов
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram Web App
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        // Apply Telegram theme colors
+        document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color || '#ffffff');
+        document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color || '#000000');
+        document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color || '#999999');
+        document.documentElement.style.setProperty('--tg-theme-link-color', tg.themeParams.link_color || '#2481cc');
+        document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color || '#2481cc');
+        document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color || '#ffffff');
+
+        let currentCurrency = 'rub';
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Currency switching
+        document.querySelectorAll('.currency-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                currentCurrency = btn.dataset.currency;
+                updatePrices(currentCurrency);
+            });
+        });
+
+        function updatePrices(currency) {
+            const symbols = {
+                'rub': '₽',
+                'usd': '$',
+                'usdt': '₮'
+            };
+
+            document.querySelectorAll('.price-main').forEach(priceEl => {
+                const price = priceEl.dataset[`price${currency.charAt(0).toUpperCase() + currency.slice(1)}`];
+                priceEl.textContent = price;
+            });
+
+            document.querySelectorAll('.price-currency').forEach(currEl => {
+                currEl.textContent = symbols[currency];
+            });
+        }
+
+        function selectPlan(planId, button) {
+            // Haptic feedback
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+
+            // Send data back to bot
+            tg.sendData(JSON.stringify({
+                plan: planId,
+                currency: currentCurrency
+            }));
+
+            // Visual feedback
+            button.textContent = '✓ Выбрано';
+            button.style.opacity = '0.6';
+            
+            setTimeout(() => {
+                tg.close();
+            }, 300);
+        }
+
+        // Handle back button
+        tg.BackButton.show();
+        tg.BackButton.onClick(() => {
+            tg.close();
+        });
+    </script>
+</body>
+</html>
