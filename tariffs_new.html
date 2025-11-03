@@ -524,9 +524,17 @@
         }
         
         // Normalize language code (take first 2 chars, convert zh-tw/zh-cn to zh)
-        const lang = ['ru', 'en', 'zh'].includes(userLang.toLowerCase().substring(0, 2)) 
-            ? userLang.toLowerCase().substring(0, 2) 
-            : 'ru';
+        let lang = userLang.toLowerCase();
+        
+        // Handle Chinese variants (zh-tw, zh-cn, zh-hk) -> zh
+        if (lang.startsWith('zh')) {
+            lang = 'zh';
+        }
+        
+        // Ensure we have a supported language
+        if (!['ru', 'en', 'zh'].includes(lang)) {
+            lang = 'ru'; // default to Russian
+        }
         
         console.log('Final selected language:', lang);
         
