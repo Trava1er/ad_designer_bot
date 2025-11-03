@@ -504,6 +504,162 @@
         tg.expand();
         tg.BackButton.show();
         
+        // Detect language from Telegram
+        const userLang = tg.initDataUnsafe?.user?.language_code || 'ru';
+        const lang = ['ru', 'en', 'zh'].includes(userLang.toLowerCase().substring(0, 2)) 
+            ? userLang.toLowerCase().substring(0, 2) 
+            : 'ru';
+        
+        // Translations
+        const translations = {
+            ru: {
+                title: 'Выбор тарифа',
+                subtitle: 'Выберите подходящий план',
+                currency: 'Валюта',
+                tabs: {
+                    onetime: 'Разовые',
+                    subscription: 'Подписки',
+                    comparison: 'Сравнение'
+                },
+                planNames: {
+                    pack1: '1 объявление',
+                    pack5: '5 объявлений',
+                    pack10: '10 объявлений',
+                    pack20: '20 объявлений',
+                    pack30: '30 объявлений',
+                    week: 'Безлимит / Неделя',
+                    month: 'Безлимит / Месяц',
+                    quarter: 'Безлимит / 3 месяца'
+                },
+                paymentNames: {
+                    card: 'Банковская карта',
+                    crypto: 'Криптовалюта',
+                    stars: 'Telegram Stars'
+                },
+                payButton: {
+                    selectPlan: 'Выберите тариф',
+                    selectPayment: 'Выберите способ оплаты',
+                    pay: 'Оплатить'
+                },
+                summary: {
+                    title: 'Итого',
+                    plan: 'Тариф',
+                    payment: 'Оплата',
+                    total: 'Сумма'
+                },
+                planDetails: {
+                    onetime: 'Разовая покупка',
+                    subscription: 'Подписка',
+                    popular: '🔥 Популярный',
+                    best: '💎 Лучшая цена'
+                }
+            },
+            en: {
+                title: 'Choose Plan',
+                subtitle: 'Select the right plan for you',
+                currency: 'Currency',
+                tabs: {
+                    onetime: 'One-time',
+                    subscription: 'Subscriptions',
+                    comparison: 'Compare'
+                },
+                planNames: {
+                    pack1: '1 Ad',
+                    pack5: '5 Ads',
+                    pack10: '10 Ads',
+                    pack20: '20 Ads',
+                    pack30: '30 Ads',
+                    week: 'Unlimited / Week',
+                    month: 'Unlimited / Month',
+                    quarter: 'Unlimited / 3 Months'
+                },
+                paymentNames: {
+                    card: 'Bank Card',
+                    crypto: 'Cryptocurrency',
+                    stars: 'Telegram Stars'
+                },
+                payButton: {
+                    selectPlan: 'Select a plan',
+                    selectPayment: 'Select payment method',
+                    pay: 'Pay'
+                },
+                summary: {
+                    title: 'Summary',
+                    plan: 'Plan',
+                    payment: 'Payment',
+                    total: 'Total'
+                },
+                planDetails: {
+                    onetime: 'One-time purchase',
+                    subscription: 'Subscription',
+                    popular: '🔥 Popular',
+                    best: '💎 Best Value'
+                }
+            },
+            zh: {
+                title: '選擇方案',
+                subtitle: '選擇適合您的方案',
+                currency: '貨幣',
+                tabs: {
+                    onetime: '單次',
+                    subscription: '訂閱',
+                    comparison: '比較'
+                },
+                planNames: {
+                    pack1: '1個廣告',
+                    pack5: '5個廣告',
+                    pack10: '10個廣告',
+                    pack20: '20個廣告',
+                    pack30: '30個廣告',
+                    week: '無限 / 週',
+                    month: '無限 / 月',
+                    quarter: '無限 / 3個月'
+                },
+                paymentNames: {
+                    card: '銀行卡',
+                    crypto: '加密貨幣',
+                    stars: 'Telegram Stars'
+                },
+                payButton: {
+                    selectPlan: '選擇方案',
+                    selectPayment: '選擇付款方式',
+                    pay: '付款'
+                },
+                summary: {
+                    title: '總計',
+                    plan: '方案',
+                    payment: '付款',
+                    total: '金額'
+                },
+                planDetails: {
+                    onetime: '單次購買',
+                    subscription: '訂閱',
+                    popular: '🔥 熱門',
+                    best: '💎 最划算'
+                }
+            }
+        };
+        
+        const t = translations[lang];
+        
+        // Update page title and text
+        document.title = t.title;
+        document.querySelector('.header h1').textContent = t.title;
+        document.querySelector('.header p').textContent = t.subtitle;
+        document.querySelector('.currency-selector h3').textContent = t.currency;
+        
+        // Update tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            const tabName = tab.dataset.tab;
+            tab.textContent = t.tabs[tabName];
+        });
+        
+        // Update summary labels
+        document.querySelector('.summary h3').textContent = t.summary.title;
+        document.querySelectorAll('.summary-row')[0].querySelector('.label').textContent = t.summary.plan + ':';
+        document.querySelectorAll('.summary-row')[1].querySelector('.label').textContent = t.summary.payment + ':';
+        document.querySelectorAll('.summary-row')[2].querySelector('.label').textContent = t.summary.total + ':';
+        
         // Prices
         const prices = {
             pack1: { RUB: 200, USD: 3, USDT: 3 },
@@ -516,22 +672,8 @@
             quarter: { RUB: 6000, USD: 90, USDT: 90 }
         };
 
-        const planNames = {
-            pack1: '1 объявление',
-            pack5: '5 объявлений',
-            pack10: '10 объявлений',
-            pack20: '20 объявлений',
-            pack30: '30 объявлений',
-            week: 'Безлимит / Неделя',
-            month: 'Безлимит / Месяц',
-            quarter: 'Безлимит / 3 месяца'
-        };
-
-        const paymentNames = {
-            card: 'Банковская карта',
-            crypto: 'Криптовалюта',
-            stars: 'Telegram Stars'
-        };
+        const planNames = t.planNames;
+        const paymentNames = t.paymentNames;
 
         let state = {
             currency: 'RUB',
@@ -588,19 +730,19 @@
                 
                 return `
                     <div class="tariff-card ${isPopular ? 'popular' : ''}" data-plan="${plan}">
-                        ${isPopular ? '<div class="badge">🔥 Популярный</div>' : ''}
+                        ${isPopular ? `<div class="badge">${t.planDetails.popular}</div>` : ''}
                         <div class="tariff-header">
                             <div>
                                 <div class="tariff-title">${planNames[plan]}</div>
-                                <div class="tariff-description">Разовая покупка</div>
+                                <div class="tariff-description">${t.planDetails.onetime}</div>
                             </div>
                             <div class="tariff-price">
                                 ${price} <span class="currency">${symbol}</span>
                             </div>
                         </div>
                         <div class="tariff-features">
-                            <div class="feature">✨ AI улучшение</div>
-                            <div class="feature">📊 Статистика</div>
+                            <div class="feature">✨ AI ${lang === 'ru' ? 'улучшение' : lang === 'en' ? 'improvement' : '改善'}</div>
+                            <div class="feature">📊 ${lang === 'ru' ? 'Статистика' : lang === 'en' ? 'Statistics' : '統計'}</div>
                             ${discount ? `<div class="feature">${discount}</div>` : ''}
                         </div>
                     </div>
@@ -615,19 +757,19 @@
                 
                 return `
                     <div class="tariff-card ${plan === 'month' ? 'popular' : ''}" data-plan="${plan}">
-                        ${plan === 'month' ? '<div class="badge">⭐ Лучший выбор</div>' : ''}
+                        ${plan === 'month' ? `<div class="badge">${t.planDetails.best}</div>` : ''}
                         <div class="tariff-header">
                             <div>
                                 <div class="tariff-title">${planNames[plan]}</div>
-                                <div class="tariff-description">Подписка с безлимитом</div>
+                                <div class="tariff-description">${t.planDetails.subscription} ${lang === 'ru' ? 'с безлимитом' : lang === 'en' ? 'unlimited' : '無限'}</div>
                             </div>
                             <div class="tariff-price">
                                 ${price} <span class="currency">${symbol}</span>
                             </div>
                         </div>
                         <div class="tariff-features">
-                            <div class="feature">∞ Безлимит объявлений</div>
-                            <div class="feature">✨ AI улучшение</div>
+                            <div class="feature">∞ ${lang === 'ru' ? 'Безлимит объявлений' : lang === 'en' ? 'Unlimited ads' : '無限廣告'}</div>
+                            <div class="feature">✨ AI ${lang === 'ru' ? 'улучшение' : lang === 'en' ? 'improvement' : '改善'}</div>
                             ${discount ? `<div class="feature">${discount}</div>` : ''}
                         </div>
                     </div>
@@ -669,13 +811,13 @@
             if (state.selectedPlan && state.selectedPayment) {
                 const price = prices[state.selectedPlan][state.currency];
                 const symbol = state.currency === 'RUB' ? '₽' : state.currency === 'USD' ? '$' : '₮';
-                button.textContent = `Оплатить ${price} ${symbol}`;
+                button.textContent = `${t.payButton.pay} ${price} ${symbol}`;
                 button.disabled = false;
             } else if (state.selectedPlan) {
-                button.textContent = 'Выберите способ оплаты';
+                button.textContent = t.payButton.selectPayment;
                 button.disabled = true;
             } else {
-                button.textContent = 'Выберите тариф';
+                button.textContent = t.payButton.selectPlan;
                 button.disabled = true;
             }
         }
