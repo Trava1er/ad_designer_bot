@@ -411,13 +411,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>💎 Выберите тариф</h1>
-            <p>Все тарифы включают AI улучшение и публикацию</p>
+            <h1></h1>
+            <p></p>
         </div>
 
         <!-- Currency Selector -->
         <div class="currency-selector">
-            <h3>💱 Валюта</h3>
+            <h3></h3>
             <div class="currency-buttons">
                 <button class="currency-btn active" data-currency="RUB">₽ RUB</button>
                 <button class="currency-btn" data-currency="USD">$ USD</button>
@@ -427,9 +427,9 @@
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab active" data-tab="onetime">📦 Разовые</button>
-            <button class="tab" data-tab="subscription">⭐ Подписки</button>
-            <button class="tab" data-tab="comparison">📊 Сравнение</button>
+            <button class="tab active" data-tab="onetime"></button>
+            <button class="tab" data-tab="subscription"></button>
+            <button class="tab" data-tab="comparison"></button>
         </div>
 
         <!-- One-time Plans -->
@@ -477,16 +477,17 @@
 
         <!-- Summary -->
         <div class="summary" id="summary">
+            <h3></h3>
             <div class="summary-row">
-                <span>Тариф:</span>
+                <span class="label"></span>
                 <span id="summary-plan">-</span>
             </div>
             <div class="summary-row">
-                <span>Способ оплаты:</span>
+                <span class="label"></span>
                 <span id="summary-payment">-</span>
             </div>
             <div class="summary-row total">
-                <span>К оплате:</span>
+                <span class="label"></span>
                 <span id="summary-total">0</span>
             </div>
         </div>
@@ -494,9 +495,7 @@
 
     <!-- Bottom Bar -->
     <div class="bottom-bar">
-        <button class="pay-button" id="pay-button" disabled>
-            Выберите тариф
-        </button>
+        <button class="pay-button" id="pay-button" disabled></button>
     </div>
 
     <script>
@@ -739,6 +738,9 @@
         document.querySelectorAll('.summary-row')[0].querySelector('.label').textContent = t.summary.plan + ':';
         document.querySelectorAll('.summary-row')[1].querySelector('.label').textContent = t.summary.payment + ':';
         document.querySelectorAll('.summary-row')[2].querySelector('.label').textContent = t.summary.total + ':';
+        
+        // Initialize pay button text
+        document.getElementById('pay-button').textContent = t.payButton.selectPlan;
         
         // Prices
         const prices = {
