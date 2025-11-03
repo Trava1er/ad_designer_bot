@@ -213,12 +213,13 @@ class PublicationService:
     """Service for publishing ads to channels."""
     
     @staticmethod
-    async def publish_ad(ad_id: int, text: str, media: Optional[List] = None):
+    async def publish_ad(ad_id: int, text: str, media: Optional[List] = None, language: str = "ru"):
         """Publish ad to target channel. Returns (channel_username, channel_id, message_id)."""
         try:
             from aiogram import Bot
             from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
             from bot_config import settings
+            from utils import MessageLoader
             
             bot = Bot(token=settings.telegram_bot_token)
             
@@ -229,12 +230,15 @@ class PublicationService:
             bot_info = await bot.get_me()
             bot_username = bot_info.username
             
+            # Get localized button text
+            button_text = MessageLoader.get_message("channel_button.create_ad", language)
+            
             # Create inline keyboard with button to bot
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
                         InlineKeyboardButton(
-                            text="📝 Создать объявление",
+                            text=button_text,
                             url=f"https://t.me/{bot_username}"
                         )
                     ]

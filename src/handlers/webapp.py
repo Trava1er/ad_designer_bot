@@ -102,7 +102,8 @@ async def handle_webapp_data(message: Message, state: FSMContext):
             channel_username, channel_id, message_id = await PublicationService.publish_ad(
                 ad_id=ad_id,
                 text=ad_text,
-                media=media
+                media=media,
+                language=language
             )
             
             logger.info(f"[DEBUG] Published ad - username: {channel_username}, channel_id: {channel_id}, message_id: {message_id}")

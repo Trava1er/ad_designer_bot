@@ -9,10 +9,10 @@ set -e
 if [ "$1" = "quick" ]; then
     echo "🚀 Quick start mode..."
     export PYTHONPATH="$(pwd):$PYTHONPATH"
-    nohup python src/main.py > logs/bot.log 2>&1 &
+    nohup .venv/bin/python src/main.py > /tmp/bot.log 2>&1 &
     echo $! > logs/bot.pid
     echo "✅ Bot started in background (PID: $!)"
-    echo "📝 Check logs: tail -f logs/bot.log"
+    echo "📝 Check logs: tail -f /tmp/bot.log"
     exit 0
 fi
 

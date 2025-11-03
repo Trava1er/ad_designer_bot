@@ -457,6 +457,10 @@ payment_methods:
   crypto: "Криптовалюта"
   stars: "Telegram Stars"
 
+# Channel post button
+channel_button:
+  create_ad: "📝 Создать объявление"
+
 # Web App errors
 webapp_errors:
   no_data: "❌ Данные не получены"

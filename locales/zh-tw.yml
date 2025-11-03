@@ -364,6 +364,10 @@ payment_methods:
   crypto: "加密貨幣"
   stars: "Telegram Stars"
 
+# Channel post button
+channel_button:
+  create_ad: "📝 創建廣告"
+
 # Web App errors
 webapp_errors:
   no_data: "❌ 未收到數據"
