@@ -165,6 +165,21 @@ payment:
   pay_button: "💳 Pay"
   
   payment_success: "✅ Payment successful! Ad sent for moderation."
+  
+  success_published: |
+    ✅ <b>Payment successful!</b>
+    
+    Your ad has been published to the channel.
+    
+    📋 <b>Plan:</b> {plan}
+    💰 <b>Amount:</b> {amount} {currency}
+    💳 <b>Payment method:</b> {payment}
+    
+    📝 <b>Ad text:</b>
+    <blockquote>{text}</blockquote>
+    
+    🔗 <b>Link to post:</b> {link}
+  
   payment_failed: "❌ Payment failed. Please try again."
   payment_cancelled: "⏹ Payment cancelled"
   
@@ -344,3 +359,39 @@ ai_prompts:
     Original text to improve:
 
     {text}
+
+  shorten_text: |
+    The text is too long ({length} characters). Telegram allows a maximum of 950 characters for photo captions.
+    
+    SHORTEN the text to 950 characters, keeping the most important:
+    - Main essence of service/product
+    - Key benefits (maximum 3-4)
+    - Price (if specified)
+    - Call to action and contact
+    
+    Remove less important details but keep structure and emojis.
+    
+    Text to shorten:
+    
+    {text}
+
+# Tariff plans
+tariff_plans:
+  pack1: "1 ad"
+  pack5: "5 ads"
+  pack10: "10 ads"
+  pack20: "20 ads"
+  pack30: "30 ads"
+  week: "Unlimited/week"
+  month: "Unlimited/month"
+  quarter: "Unlimited/3 months"
+
+# Payment methods
+payment_methods:
+  card: "Bank card"
+  crypto: "Cryptocurrency"
+  stars: "Telegram Stars"
+
+# Web App errors
+webapp_errors:
+  no_data: "❌ No data received"

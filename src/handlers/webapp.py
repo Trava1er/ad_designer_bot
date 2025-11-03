@@ -7,7 +7,8 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 
-from database import DatabaseManager
+from database import DatabaseManager, AdRepository
+from services import PublicationService
 from utils import (
     get_user_info_from_message,
     get_payment_method_keyboard,
@@ -31,7 +32,14 @@ async def handle_webapp_data(message: Message, state: FSMContext):
     try:
         # Parse data from Web App
         if not message.web_app_data:
-            await message.answer("❌ Данные не получены")
+            # Get user language first
+            user_id, language = await get_user_info_from_message(
+                message, 
+                get_db_session, 
+                get_or_create_user
+            )
+            error_text = MessageLoader.get_message("webapp_errors.no_data", language)
+            await message.answer(error_text)
             return
         
         data = json.loads(message.web_app_data.data)
@@ -47,32 +55,15 @@ async def handle_webapp_data(message: Message, state: FSMContext):
             get_or_create_user
         )
         
-        # Plan names for localization
-        plan_names = {
-            "pack1": {"ru": "1 объявление", "en": "1 ad", "zh-tw": "1個廣告"},
-            "pack5": {"ru": "5 объявлений", "en": "5 ads", "zh-tw": "5個廣告"},
-            "pack10": {"ru": "10 объявлений", "en": "10 ads", "zh-tw": "10個廣告"},
-            "pack20": {"ru": "20 объявлений", "en": "20 ads", "zh-tw": "20個廣告"},
-            "pack30": {"ru": "30 объявлений", "en": "30 ads", "zh-tw": "30個廣告"},
-            "week": {"ru": "Безлимит/неделя", "en": "Unlimited/week", "zh-tw": "無限/週"},
-            "month": {"ru": "Безлимит/месяц", "en": "Unlimited/month", "zh-tw": "無限/月"},
-            "quarter": {"ru": "Безлимит/3 месяца", "en": "Unlimited/3 months", "zh-tw": "無限/3個月"}
-        }
-        
-        payment_method_names = {
-            "card": {"ru": "Банковская карта", "en": "Bank card", "zh-tw": "銀行卡"},
-            "crypto": {"ru": "Криптовалюта", "en": "Cryptocurrency", "zh-tw": "加密貨幣"},
-            "stars": {"ru": "Telegram Stars", "en": "Telegram Stars", "zh-tw": "Telegram Stars"}
-        }
+        # Get localized plan and payment method names
+        plan_name = MessageLoader.get_message(f"tariff_plans.{plan_id}", language)
+        payment_name = MessageLoader.get_message(f"payment_methods.{payment_method}", language)
         
         # Validate
         if not plan_id or not payment_method or not amount:
             error_text = MessageLoader.get_message("errors.invalid_tariff", language)
             await message.answer(error_text)
             return
-        
-        plan_name = plan_names.get(plan_id, {}).get(language, plan_id)
-        payment_name = payment_method_names.get(payment_method, {}).get(language, payment_method)
         
         # Save to state
         await state.update_data(
@@ -86,31 +77,79 @@ async def handle_webapp_data(message: Message, state: FSMContext):
         # Get ad text from state
         state_data = await state.get_data()
         ad_text = state_data.get("ad_text", "")
+        image_file_id = state_data.get("image_file_id")
+        has_image = state_data.get("has_image", False)
         
-        # Create payment and process
-        # For now, simulate successful payment and show success message
-        success_text = f"""
-✅ <b>Платеж успешно обработан!</b>
-
-📦 Тариф: {plan_name}
-💰 Сумма: {amount} {currency}
-💳 Способ: {payment_name}
-
-📝 Ваше объявление:
-<blockquote>{ad_text[:200]}{'...' if len(ad_text) > 200 else ''}</blockquote>
-
-📢 Объявление опубликовано!
-
-🔗 Ссылка на пост: https://t.me/your_channel/123
-
-Спасибо за использование нашего сервиса! 🎉
-"""
+        if not ad_text:
+            error_text = MessageLoader.get_message("errors.general", language)
+            await message.answer(error_text)
+            return
         
-        await message.answer(
-            success_text,
-            parse_mode="HTML",
-            reply_markup=get_main_menu_keyboard(language)
-        )
+        # Create ad in database
+        with get_db_session() as db:
+            ad = AdRepository.create_ad(
+                db=db,
+                user_id=user_id,
+                text=ad_text,
+                media=image_file_id if has_image and image_file_id else None
+            )
+            ad_id = ad.id
+            db.commit()
+        
+        # Publish ad to channel
+        try:
+            media = [image_file_id] if has_image and image_file_id else None
+            channel_username, channel_title, message_id = await PublicationService.publish_ad(
+                ad_id=ad_id,
+                text=ad_text,
+                media=media
+            )
+            
+            # Update ad with publication details
+            with get_db_session() as db:
+                updated_ad = AdRepository.update_ad_status(
+                    db=db,
+                    ad_id=ad_id,
+                    status="published"
+                )
+                if updated_ad:
+                    # Update additional fields
+                    updated_ad.channel_id = f"@{channel_username}" if channel_username else str(channel_title)
+                    updated_ad.amount_paid = float(amount)
+                    updated_ad.placement_duration = plan_name
+                    db.commit()
+            
+            # Create post link
+            if channel_username:
+                post_link = f"https://t.me/{channel_username}/{message_id}"
+            else:
+                # If no username, use channel ID format
+                post_link = f"https://t.me/c/{str(channel_title).replace('-100', '')}/{message_id}"
+            
+            # Отправляем успешное сообщение с деталями
+            success_message = MessageLoader.get_message(
+                "payment.success_published",
+                language,
+                plan=plan_name,
+                amount=amount,
+                currency=currency,
+                payment=payment_name,
+                text=ad_text,
+                link=post_link
+            )
+            
+            await message.answer(
+                success_message,
+                parse_mode="HTML",
+                reply_markup=get_main_menu_keyboard(language)
+            )
+            
+        except Exception as e:
+            logger.error(f"Error publishing ad: {e}", exc_info=True)
+            # Ad created but not published
+            error_text = MessageLoader.get_message("errors.general", language)
+            await message.answer(error_text)
+            return
         
         # Clear state
         await state.clear()

@@ -672,6 +672,7 @@ async def process_ai_improvement(
 ) -> Optional[str]:
     """
     Process text with AI improvement.
+    Automatically shortens text if it exceeds 950 characters.
     
     Args:
         ai_service: AI service instance
@@ -689,14 +690,44 @@ async def process_ai_improvement(
             logger.warning("OpenAI API key not configured")
             return None
         
+        # First improvement attempt
         prompt = MessageLoader.get_message(prompt_key, language, text=original_text)
         improved_text = await ai_service.generate_text(prompt, language)
         
         # Check if improvement was successful
-        if improved_text and improved_text not in ["Ошибка генерации текста", "Text generation error"]:
-            return improved_text
+        if not improved_text or improved_text in ["Ошибка генерации текста", "Text generation error", "文本生成錯誤"]:
+            return None
         
-        return None
+        # Check text length and automatically shorten if needed
+        max_retries = 2
+        retry_count = 0
+        
+        while len(improved_text) > 950 and retry_count < max_retries:
+            logger.info(f"Text too long ({len(improved_text)} chars), shortening... (attempt {retry_count + 1}/{max_retries})")
+            
+            # Use shorten prompt
+            shorten_prompt = MessageLoader.get_message(
+                "ai_prompts.shorten_text", 
+                language, 
+                text=improved_text,
+                length=len(improved_text)
+            )
+            improved_text = await ai_service.generate_text(shorten_prompt, language)
+            
+            if not improved_text or improved_text in ["Ошибка генерации текста", "Text generation error", "文本生成錯誤"]:
+                # If shortening failed, truncate manually as last resort
+                logger.warning("AI shortening failed, truncating manually")
+                improved_text = improved_text[:947] + "..."
+                break
+            
+            retry_count += 1
+        
+        # Final check - if still too long after retries, truncate
+        if len(improved_text) > 950:
+            logger.warning(f"Text still too long after {max_retries} retries, truncating to 950 chars")
+            improved_text = improved_text[:947] + "..."
+        
+        return improved_text
         
     except Exception as e:
         logger.error(f"AI improvement failed: {e}", exc_info=True)
@@ -760,6 +791,22 @@ async def show_ai_result_with_image(
         improved_text=improved_text,
         ai_improvements_today=ai_improvements_today
     )
+    
+    # Telegram caption limit is 1024, but we use 950 for safety
+    # If full_text exceeds limit, truncate improved_text part
+    if len(full_text) > 1024:
+        logger.warning(f"Caption too long ({len(full_text)} chars), truncating improved_text")
+        # Calculate how much space we need for the template
+        template_overhead = len(full_text) - len(improved_text)
+        max_improved_text_length = 1024 - template_overhead - 3  # -3 for "..."
+        truncated_improved_text = improved_text[:max_improved_text_length] + "..."
+        
+        full_text = MessageLoader.get_message(
+            "ad_creation.ai_improved", 
+            language, 
+            improved_text=truncated_improved_text,
+            ai_improvements_today=ai_improvements_today
+        )
     
     # Send with image if user had one
     if data.get("has_image") and data.get("image_file_id"):
