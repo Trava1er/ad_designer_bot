@@ -26,6 +26,12 @@ welcome:
 
 # Ad creation flow
 ad_creation:
+  paste_text: |
+    📝 創建廣告
+    
+    發送您的廣告文字（可附帶照片）。
+    
+    如果您希望AI改進文字 - 只需先發送草稿！
   choose_channel: "📢 選擇發布頻道："
   choose_text_method: |
     📝 如何創建廣告文字？
@@ -76,6 +82,17 @@ ad_creation:
   files_uploaded: "✅ 已上傳文件：{count}"
   max_files_exceeded: "⚠️ 最多10個文件"
   
+  ai_comparison: |
+    📊 版本比較：
+    
+    📝 <b>您的文字</b> ({original_chars} 個字符):
+    {original_text}
+    
+    ✨ <b>AI改進的文字</b> ({improved_chars} 個字符):
+    {improved_text}
+    
+    使用哪個版本？
+  
   # Final preview
   final_preview: |
     📋 最終廣告：
@@ -85,6 +102,35 @@ ad_creation:
     📎 媒體：{media_count}個文件
     
     繼續選擇價格方案？
+  
+  # AI processing
+  processing_ai: "🤖 使用AI處理中..."
+  choose_ai_option: |
+    📝 已收到文字！
+    
+    💡 想用AI改善文字嗎？
+  ai_improved: |
+    ✅ <b>文字已用AI改善！</b>
+    
+    <blockquote>{improved_text}</blockquote>
+    
+    � 點擊下方按鈕選擇方案並付款。
+  text_approved: |
+    ✅ 很好！
+    
+    💎 點擊下方按鈕選擇方案並付款。
+  ai_not_configured: |
+    ⚠️ AI暫時不可用
+    
+    繼續使用您的文字？
+  ai_error: |
+    ❌ AI處理錯誤
+    
+    繼續使用原始文字？
+  ai_unavailable: |
+    ⚠️ AI不可用
+    
+    {text}
 
 # Tariffs
 tariffs:
@@ -223,3 +269,50 @@ common:
   error: "❌ 錯誤"
   warning: "⚠️ 警告"
   info: "ℹ️ 信息"
+
+# AI Prompts
+ai_prompts:
+  improve_service_ad: |
+    你是專業的文案撰寫人和 Telegram 頻道廣告專家。
+
+    你的任務：改善廣告文本，使其盡可能吸引人和專業。
+
+    改善規則：
+
+    1. 結構（必須）：
+       ✅ 以引人注目的標題和表情符號開始
+       ✅ 清晰描述服務/產品
+       ✅ 關鍵優勢（客戶獲得什麼）
+       ✅ 行動號召和聯繫方式
+
+    2. 格式（重要！）：
+       ✅ 使用段落 - 分隔每個語義塊
+       ✅ 添加表情符號進行視覺分隔 (🎯 📊 ✨ 💎 📍 📞)
+       ✅ 使用項目列表進行枚舉
+       ✅ 文本應該通風易讀
+       ⚠️ 關鍵：文本長度嚴格不超過 950 個字符！這是 Telegram 照片標題的限制。
+       ✅ 最佳長度：300-800 字符（足夠詳細，但不要太長）
+
+    3. 內容：
+       ✅ 保留原文中的所有重要信息
+       ✅ 不要編造原文沒有的事實
+       ✅ 如果提到價格 - 保留它們
+       ✅ 如果提到聯繫方式 - 保留它們
+       ✅ 添加具體內容而不是籠統短語
+       ✅ 關注客戶利益
+
+    4. 風格：
+       ✅ 自信和專業的語氣
+       ✅ 使用第一人稱：「我提供」、「我幫助」、「我創建」
+       ✅ 避免陳詞濫調
+       ✅ 具體事實而不是籠統承諾
+
+    5. 行動號召：
+       ✅ 清晰的指示 - 如何聯繫
+       ✅ 行動動機（限時優惠、獎勵等）
+
+    ---
+
+    原始文本進行改善：
+
+    {text}

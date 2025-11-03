@@ -1,0 +1,264 @@
+{
+  "_comment": "Keyboard layouts for the bot. URL buttons for web integration will be added when landing page is ready.",
+  "_web_integration_plan": {
+    "help_menu": "Add URL button: '📖 Полная инструкция' -> https://addesigner.hub/guide",
+    "tariff_selection": "Add URL button: '📊 Сравнить на сайте' -> https://addesigner.hub/tariffs",
+    "main_menu": "Add URL button: '🎬 Примеры работ' -> https://addesigner.hub/examples"
+  },
+  "main_menu": {
+    "ru": [
+      ["📝 Создать объявление"],
+      ["💼 Мои объявления", "ℹ️ Помощь"]
+    ],
+    "en": [
+      ["📝 Create Ad"],
+      ["� My Ads", "ℹ️ Help"]
+    ],
+    "zh-tw": [
+      ["📝 建立廣告"],
+      ["� 我的廣告", "ℹ️ 幫助"]
+    ]
+  },
+  "tariff_selection": {
+    "ru": [
+      ["🎯 1 объявление"],
+      ["📦 10 объявлений 🔥 Выгода 60%"],
+      ["🏆 Безлимит/месяц 💎 Лучшая цена"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["🎯 1 Ad"],
+      ["📦 10 Ads 🔥 Save 60%"],
+      ["🏆 Unlimited/month 💎 Best Value"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["🎯 單次"],
+      ["📦 10次 🔥 省60%"],
+      ["🏆 無限/月 💎 最划算"],
+      ["🏠 主選單"]
+    ]
+  },
+  "payment_method": {
+    "ru": [
+      ["💳 Банковская карта"],
+      ["💎 Криптовалюта"],
+      ["⭐ Telegram Stars"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["💳 Bank Card"],
+      ["💎 Cryptocurrency"],
+      ["⭐ Telegram Stars"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["💳 銀行卡"],
+      ["💎 加密貨幣"],
+      ["⭐ Telegram Stars"],
+      ["🏠 主選單"]
+    ]
+  },
+  "my_ads": {
+    "ru": [
+      ["👁️ Просмотреть", "🕓 Продлить"],
+      ["✏️ Изменить", "❌ Удалить"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["👁️ View", "🕓 Extend"],
+      ["✏️ Edit", "❌ Delete"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["👁️ 查看", "🕓 延長"],
+      ["✏️ 編輯", "❌ 刪除"],
+      ["🏠 主選單"]
+    ]
+  },
+  "confirmation": {
+    "ru": [
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["🏠 主選單"]
+    ]
+  },
+  "ad_creation": {
+    "ru": [
+      ["⬅️ Отмена", "🏠 Главное меню"]
+    ],
+    "en": [
+      ["⬅️ Cancel", "🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["⬅️ 取消", "🏠 主選單"]
+    ]
+  },
+  "ai_processing_options": {
+    "ru": [
+      ["✨ Улучшить с AI"],
+      ["➡️ Продолжить с моим текстом"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["✨ Improve with AI"],
+      ["➡️ Continue with my text"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["✨ 用 AI 改善"],
+      ["➡️ 繼續使用我的文字"],
+      ["🏠 主選單"]
+    ]
+  },
+  "ai_result_confirmation": {
+    "ru": [
+      ["✅ Продолжить с этим текстом"],
+      ["👁 Показать что изменилось"],
+      ["✏️ Редактировать текст"],
+      ["🔄 Улучшить заново"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["✅ Continue with this text"],
+      ["👁 Show what changed"],
+      ["✏️ Edit text"],
+      ["🔄 Improve again"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["✅ 繼續使用此文字"],
+      ["👁 顯示變更內容"],
+      ["✏️ 編輯文字"],
+      ["🔄 重新改善"],
+      ["🏠 主選單"]
+    ]
+  },
+  "text_method": {
+    "ru": [
+      ["🤖 Генерировать с AI"],
+      ["✏️ Написать вручную"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["🤖 Generate with AI"],
+      ["✏️ Write Manually"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["🤖 使用 AI 生成"],
+      ["✏️ 手動編寫"],
+      ["🏠 主選單"]
+    ]
+  },
+  "media_method": {
+    "ru": [
+      ["🤖 Сгенерировать с AI"],
+      ["📎 Загрузить файл"],
+      ["🚫 Без медиа"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["🤖 Generate with AI"],
+      ["📎 Upload File"],
+      ["🚫 No Media"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["🤖 使用 AI 生成"],
+      ["📎 上傳文件"],
+      ["🚫 無媒體"],
+      ["🏠 主選單"]
+    ]
+  },
+  "currency_selection": {
+    "ru": [
+      ["🇷🇺 Рубли (RUB)"],
+      ["🇺🇸 Доллары (USD)"],
+      ["₿ USDT"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["🇷🇺 Rubles (RUB)"],
+      ["🇺🇸 Dollars (USD)"],
+      ["₿ USDT"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["🇷🇺 盧布 (RUB)"],
+      ["🇺🇸 美元 (USD)"],
+      ["₿ USDT"],
+      ["🏠 主選單"]
+    ]
+  },
+  "language_selection": {
+    "ru": [
+      ["🇷🇺 Русский"],
+      ["🇺🇸 English"],
+      ["🇹🇼 繁體中文"]
+    ],
+    "en": [
+      ["🇷🇺 Русский"],
+      ["🇺🇸 English"],
+      ["🇹🇼 繁體中文"]
+    ],
+    "zh-tw": [
+      ["🇷🇺 Русский"],
+      ["🇺🇸 English"],
+      ["🇹🇼 繁體中文"]
+    ]
+  },
+  "ad_preview": {
+    "ru": [
+      ["✏️ Редактировать", "🤖 Улучшить с AI"],
+      ["💰 Перейти к оплате"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["✏️ Edit", "🤖 Improve with AI"],
+      ["💰 Proceed to Payment"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["✏️ 編輯", "🤖 使用 AI 改進"],
+      ["💰 前往付款"],
+      ["🏠 主選單"]
+    ]
+  },
+  "admin_moderation": {
+    "ru": [
+      ["✅ Одобрить", "❌ Отклонить"],
+      ["⏭️ Следующее"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["✅ Approve", "❌ Reject"],
+      ["⏭️ Next"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["✅ 批准", "❌ 拒絕"],
+      ["⏭️ 下一個"],
+      ["🏠 主選單"]
+    ]
+  },
+  "payment_processing": {
+    "ru": [
+      ["❌ Отменить оплату"],
+      ["🏠 Главное меню"]
+    ],
+    "en": [
+      ["❌ Cancel Payment"],
+      ["🏠 Main Menu"]
+    ],
+    "zh-tw": [
+      ["❌ 取消付款"],
+      ["🏠 主選單"]
+    ]
+  }
+}
+

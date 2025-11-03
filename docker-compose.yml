@@ -1,0 +1,124 @@
+version: '3.8'
+
+services:
+  # Main bot service
+  bot:
+    build: .
+    container_name: addesigner_bot
+    restart: unless-stopped
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - ADMIN_ID=${ADMIN_ID}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/addesigner_db
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - YOOKASSA_SHOP_ID=${YOOKASSA_SHOP_ID}
+      - YOOKASSA_SECRET_KEY=${YOOKASSA_SECRET_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - NOWPAYMENTS_API_KEY=${NOWPAYMENTS_API_KEY}
+      - WEBHOOK_URL=${WEBHOOK_URL}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./logs:/app/logs
+      - ./receipts:/app/receipts
+      - ./images:/app/images
+    command: python bot.py
+
+  # Webhook service
+  webhooks:
+    build: .
+    container_name: addesigner_webhooks
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/addesigner_db
+      - YOOKASSA_SHOP_ID=${YOOKASSA_SHOP_ID}
+      - YOOKASSA_SECRET_KEY=${YOOKASSA_SECRET_KEY}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - NOWPAYMENTS_API_KEY=${NOWPAYMENTS_API_KEY}
+    depends_on:
+      - db
+    command: python webhook_server.py
+
+  # PostgreSQL database
+  db:
+    image: postgres:15
+    container_name: addesigner_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=addesigner_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: addesigner_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: addesigner_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - webhooks
+
+  # Monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus
+    container_name: addesigner_prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana
+    container_name: addesigner_grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana:/etc/grafana/provisioning
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  default:
+    name: addesigner_network

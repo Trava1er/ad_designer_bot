@@ -26,6 +26,12 @@ welcome:
 
 # Ad creation flow
 ad_creation:
+  paste_text: |
+    📝 Creating advertisement
+    
+    Send the text of your ad (can include photo).
+    
+    If you want AI to improve the text - just send a draft first!
   choose_channel: "📢 Choose channel for posting:"
   choose_text_method: |
     📝 How to create ad text?
@@ -76,6 +82,17 @@ ad_creation:
   files_uploaded: "✅ Files uploaded: {count}"
   max_files_exceeded: "⚠️ Maximum 10 files"
   
+  ai_comparison: |
+    📊 Version Comparison:
+    
+    📝 <b>Your text</b> ({original_chars} characters):
+    {original_text}
+    
+    ✨ <b>AI-improved text</b> ({improved_chars} characters):
+    {improved_text}
+    
+    Which version to use?
+  
   # Final preview
   final_preview: |
     📋 Final ad:
@@ -85,6 +102,35 @@ ad_creation:
     📎 Media: {media_count} files
     
     Continue to pricing selection?
+  
+  # AI processing
+  processing_ai: "🤖 Processing with AI..."
+  choose_ai_option: |
+    📝 Text received!
+    
+    💡 Want to improve text with AI?
+  ai_improved: |
+    ✅ <b>Text improved with AI!</b>
+    
+    <blockquote>{improved_text}</blockquote>
+    
+    � Tap the button below to choose a plan and make payment.
+  text_approved: |
+    ✅ Great!
+    
+    💎 Tap the button below to choose a plan and make payment.
+  ai_not_configured: |
+    ⚠️ AI temporarily unavailable
+    
+    Continue with your text?
+  ai_error: |
+    ❌ Error processing AI
+    
+    Continue with original text?
+  ai_unavailable: |
+    ⚠️ AI unavailable
+    
+    {text}
 
 # Tariffs
 tariffs:
@@ -223,3 +269,78 @@ common:
   error: "❌ Error"
   warning: "⚠️ Warning"
   info: "ℹ️ Information"
+
+# AI Prompts
+ai_prompts:
+  improve_service_ad: |
+    You are a professional copywriter and expert in creating compelling ads for Telegram channels.
+
+    Your task: improve the ad text, making it as attractive and professional as possible.
+
+    IMPROVEMENT RULES:
+
+    1. STRUCTURE (mandatory):
+       ✅ Start with a catchy headline with emoji
+       ✅ Clear description of service/product
+       ✅ Key benefits (what client gets)
+       ✅ Call to action and contacts
+
+    2. FORMATTING (IMPORTANT!):
+       ✅ Use paragraphs - separate each semantic block
+       ✅ Add emojis for visual separation (🎯 📊 ✨ 💎 📍 📞)
+       ✅ Use bullet lists for enumerations
+       ✅ Text should be airy and easy to read
+       ⚠️ CRITICAL: Text length STRICTLY no more than 950 characters! This is Telegram's limit for photo captions.
+       ✅ Optimal length: 300-800 characters (detailed enough, but not too long)
+
+    3. CONTENT:
+       ✅ Keep ALL important information from original
+       ✅ DON'T make up facts not in the original text
+       ✅ If prices mentioned - keep them
+       ✅ If contacts mentioned - keep them
+       ✅ Add specifics instead of generic phrases
+       ✅ Focus on client benefits
+
+    4. STYLE:
+       ✅ Confident and professional tone
+       ✅ Write in first person: "I offer", "I help", "I create"
+       ✅ Avoid clichés like "quality and cheap"
+       ✅ Specific facts instead of generic promises
+
+    5. CALL TO ACTION:
+       ✅ Clear instruction - how to contact
+       ✅ Motivation to act (limited offer, bonus, etc.)
+
+    EXAMPLE OF GOOD AD:
+
+    🚀 Professional Website for Your Business
+
+    👨‍💻 Web Developer with 5+ years experience
+
+    💎 What you get:
+    — Modern responsive design
+    — Fast loading on all devices
+    — SEO optimization for search engines
+    — CRM and analytics integration
+
+    🛠 Technologies:
+    React, Vue.js, Node.js, Python, PostgreSQL
+
+    ✅ I guarantee:
+    • Clean code and documentation
+    • Meeting deadlines
+    • Support after launch
+
+    📍 Remote work worldwide
+
+    💰 Price: from $600 (depends on complexity)
+
+    📩 Let's discuss your project: @username
+
+    ⚡ First consultation free!
+
+    ---
+
+    Original text to improve:
+
+    {text}

@@ -11,10 +11,14 @@ from typing import List, Optional
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
-    # Bot configuration
-    telegram_bot_token: str = Field(..., description="Telegram bot token from BotFather")
-    admin_id: int = Field(..., description="Admin Telegram user ID")
+        # Bot configuration
+    telegram_bot_token: str = Field(default="demo_token", description="Telegram Bot API token")
+    admin_id: int = Field(default=123456789, description="Admin user ID for bot management")
     bot_username: str = Field(default="AdDesignerHubBot", description="Bot username")
+    
+    # Single channel configuration
+    target_channel_id: str = Field(default="-1001234567890", description="Target channel ID for posting ads (e.g., @channel_name or -1001234567890)")
+    target_channel_name: str = Field(default="Основной канал", description="Target channel display name")
     
     # Database
     database_url: str = Field(default="sqlite:///./app.db", description="Database connection URL")
@@ -26,7 +30,7 @@ class Settings(BaseSettings):
     openai_max_tokens: int = Field(default=1000, description="Max tokens for OpenAI text generation")
     
     # Default channel
-    channel_id_default: int = Field(..., description="Default channel ID for posting ads")
+    channel_id_default: int = Field(default=-1001234567890, description="Default channel ID for posting ads")
     
     # Payment providers
     # RUB payments (Yookassa)
@@ -44,6 +48,9 @@ class Settings(BaseSettings):
     
     # Application settings
     webhook_url: Optional[str] = Field(default=None, description="Webhook URL for payment callbacks")
+    # Webhook settings
+    webhook_url: Optional[str] = Field(default=None, description="Webhook base URL")
+    webhook_port: int = Field(default=8080, description="Webhook server port")
     webhook_path: str = Field(default="/webhook", description="Webhook path")
     webhook_port: int = Field(default=8080, description="Webhook port")
     
@@ -55,6 +62,9 @@ class Settings(BaseSettings):
     # Limits
     max_ad_text_length: int = Field(default=4000, description="Maximum ad text length")
     max_media_files: int = Field(default=10, description="Maximum media files per ad")
+    
+    # Monitoring
+    metrics_port: int = Field(default=8000, description="Prometheus metrics server port")
     max_file_size_mb: int = Field(default=50, description="Maximum file size in MB")
     
     # Receipt settings

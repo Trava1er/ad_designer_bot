@@ -47,10 +47,21 @@ venv.bak/
 *.db
 *.sqlite
 *.sqlite3
+*.db-shm
+*.db-wal
+*.db-journal
 
 # Logs
 logs/
 *.log
+
+# Dependencies flag
+.dependencies_installed
+
+# Backup files
+*.bak
+*_backup
+*_old/
 
 # Generated files
 static/receipts/
