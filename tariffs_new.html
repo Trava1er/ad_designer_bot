@@ -504,11 +504,32 @@
         tg.expand();
         tg.BackButton.show();
         
-        // Detect language from Telegram
-        const userLang = tg.initDataUnsafe?.user?.language_code || 'ru';
+        // Detect language - priority: URL param > Telegram user settings > navigator > default
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        
+        let userLang = 'ru'; // default
+        
+        if (urlLang) {
+            // Use language from URL (sent by bot)
+            userLang = urlLang;
+            console.log('Language from URL parameter:', userLang);
+        } else if (tg.initDataUnsafe?.user?.language_code) {
+            // Try to get from Telegram user data
+            userLang = tg.initDataUnsafe.user.language_code;
+            console.log('Language from initDataUnsafe.user:', userLang);
+        } else if (navigator.language) {
+            // Fallback to browser language
+            userLang = navigator.language;
+            console.log('Language from navigator:', userLang);
+        }
+        
+        // Normalize language code (take first 2 chars, convert zh-tw/zh-cn to zh)
         const lang = ['ru', 'en', 'zh'].includes(userLang.toLowerCase().substring(0, 2)) 
             ? userLang.toLowerCase().substring(0, 2) 
             : 'ru';
+        
+        console.log('Final selected language:', lang);
         
         // Translations
         const translations = {
