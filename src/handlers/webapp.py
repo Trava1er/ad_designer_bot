@@ -99,7 +99,7 @@ async def handle_webapp_data(message: Message, state: FSMContext):
         # Publish ad to channel
         try:
             media = [image_file_id] if has_image and image_file_id else None
-            channel_username, channel_title, message_id = await PublicationService.publish_ad(
+            channel_username, channel_id, message_id = await PublicationService.publish_ad(
                 ad_id=ad_id,
                 text=ad_text,
                 media=media
@@ -114,7 +114,7 @@ async def handle_webapp_data(message: Message, state: FSMContext):
                 )
                 if updated_ad:
                     # Update additional fields
-                    updated_ad.channel_id = f"@{channel_username}" if channel_username else str(channel_title)
+                    updated_ad.channel_id = f"@{channel_username}" if channel_username else str(channel_id)
                     updated_ad.amount_paid = float(amount)
                     updated_ad.placement_duration = plan_name
                     db.commit()
@@ -123,8 +123,9 @@ async def handle_webapp_data(message: Message, state: FSMContext):
             if channel_username:
                 post_link = f"https://t.me/{channel_username}/{message_id}"
             else:
-                # If no username, use channel ID format
-                post_link = f"https://t.me/c/{str(channel_title).replace('-100', '')}/{message_id}"
+                # If no username, use channel ID format (remove -100 prefix)
+                clean_channel_id = str(channel_id).replace('-100', '')
+                post_link = f"https://t.me/c/{clean_channel_id}/{message_id}"
             
             # Отправляем успешное сообщение с деталями
             success_message = MessageLoader.get_message(

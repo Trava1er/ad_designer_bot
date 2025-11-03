@@ -214,7 +214,7 @@ class PublicationService:
     
     @staticmethod
     async def publish_ad(ad_id: int, text: str, media: Optional[List] = None):
-        """Publish ad to target channel. Returns (channel_username, channel_title, message_id)."""
+        """Publish ad to target channel. Returns (channel_username, channel_id, message_id)."""
         try:
             from aiogram import Bot
             from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -261,23 +261,21 @@ class PublicationService:
             
             logger.info(f"Ad {ad_id} published to channel {channel_id}")
             
-            # Get channel info for username and title
+            # Get channel info for username
+            channel_username = None
             try:
                 channel_info = await bot.get_chat(channel_id)
                 channel_username = getattr(channel_info, 'username', None)
-                channel_title = getattr(channel_info, 'title', 'Channel')
                 
-                logger.info(f"[DEBUG] Channel info: username={channel_username}, title={channel_title}")
+                logger.info(f"[DEBUG] Channel info: username={channel_username}, channel_id={channel_id}")
                         
             except Exception as e:
                 logger.warning(f"Could not get channel info: {e}")
-                channel_username = None
-                channel_title = "Channel"
             
             # Close bot session
             await bot.session.close()
             
-            return (channel_username, channel_title, sent_message.message_id)
+            return (channel_username, channel_id, sent_message.message_id)
             
         except Exception as e:
             logger.error(f"Publication error: {e}")
