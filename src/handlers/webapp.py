@@ -105,6 +105,8 @@ async def handle_webapp_data(message: Message, state: FSMContext):
                 media=media
             )
             
+            logger.info(f"[DEBUG] Published ad - username: {channel_username}, channel_id: {channel_id}, message_id: {message_id}")
+            
             # Update ad with publication details
             with get_db_session() as db:
                 updated_ad = AdRepository.update_ad_status(
