@@ -38,7 +38,7 @@ async def get_or_create_user(user_id: int, username: Optional[str] = None,
     
     user = db.query(User).filter(User.id == user_id).first()
     
-    if not user_id:
+    if not user:
         user = User(
             id=user_id,
             username=username or "unknown",

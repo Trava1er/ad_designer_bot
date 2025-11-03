@@ -69,29 +69,42 @@ async def language_selection(message: Message, state: FSMContext):
     
     language_code = language_map.get(message.text, "ru")
     
+    logger.info(f"Processing language selection for user {message.from_user.id}: {language_code}")
+    
     with get_db_session() as db:
-        user = db.query(User).filter(User.id == message.from_user.id).first()
-        if user:
-            setattr(user, 'language', language_code)
-            db.commit()
-            
-            await state.clear()
-            
-            # Get statistics for social proof
-            stats = get_bot_statistics()
-            
-            # Welcome message with selected language
-            welcome_text = localization.get_text(
-                "welcome.start", language_code, 
-                user_name=user.full_name or "User",
-                total_ads=stats["total_ads"],
-                total_users=stats["total_users"]
-            )
-            
-            await message.answer(
-                welcome_text,
-                reply_markup=get_main_menu_keyboard(language_code),
-                parse_mode="HTML"
-            )
-            
-            bot_logger.log_user_action(message.from_user.id, "language_selected", language_code)
+        # Ensure user exists in database
+        user = await get_or_create_user(
+            message.from_user.id,
+            message.from_user.username,
+            message.from_user.full_name,
+            db
+        )
+        
+        # Update language
+        setattr(user, 'language', language_code)
+        db.commit()
+        
+        await state.clear()
+        
+        # Get statistics for social proof
+        stats = get_bot_statistics()
+        
+        logger.info(f"User {user.id} selected language: {language_code}")
+        
+        # Welcome message with selected language
+        welcome_text = localization.get_text(
+            "welcome.start", language_code, 
+            user_name=user.full_name or "User",
+            total_ads=stats["total_ads"],
+            total_users=stats["total_users"]
+        )
+        
+        logger.info(f"Sending welcome message to user {user.id}: {welcome_text[:50]}...")
+        
+        await message.answer(
+            welcome_text,
+            reply_markup=get_main_menu_keyboard(language_code),
+            parse_mode="HTML"
+        )
+        
+        bot_logger.log_user_action(message.from_user.id, "language_selected", language_code)
