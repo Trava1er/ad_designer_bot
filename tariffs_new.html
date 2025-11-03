@@ -536,6 +536,12 @@
                     crypto: 'Криптовалюта',
                     stars: 'Telegram Stars'
                 },
+                paymentDescriptions: {
+                    card: 'Visa, MasterCard, Мир',
+                    crypto: 'USDT, BTC, ETH',
+                    stars: 'Оплата через Telegram'
+                },
+                paymentMethodsTitle: '💳 Способ оплаты',
                 payButton: {
                     selectPlan: 'Выберите тариф',
                     selectPayment: 'Выберите способ оплаты',
@@ -551,7 +557,18 @@
                     onetime: 'Разовая покупка',
                     subscription: 'Подписка',
                     popular: '🔥 Популярный',
-                    best: '💎 Лучшая цена'
+                    best: '💎 Лучшая цена',
+                    withUnlimited: 'с безлимитом',
+                    unlimitedAds: 'Безлимит объявлений',
+                    aiImprovement: 'AI улучшение',
+                    statistics: 'Статистика'
+                },
+                comparison: {
+                    plan: 'Тариф',
+                    price: 'Цена',
+                    ads: 'Объявлений',
+                    period: 'Период',
+                    onetime: 'Разово'
                 }
             },
             en: {
@@ -578,6 +595,12 @@
                     crypto: 'Cryptocurrency',
                     stars: 'Telegram Stars'
                 },
+                paymentDescriptions: {
+                    card: 'Visa, MasterCard',
+                    crypto: 'USDT, BTC, ETH',
+                    stars: 'Pay via Telegram'
+                },
+                paymentMethodsTitle: '💳 Payment Method',
                 payButton: {
                     selectPlan: 'Select a plan',
                     selectPayment: 'Select payment method',
@@ -593,7 +616,18 @@
                     onetime: 'One-time purchase',
                     subscription: 'Subscription',
                     popular: '🔥 Popular',
-                    best: '💎 Best Value'
+                    best: '💎 Best Value',
+                    withUnlimited: 'unlimited',
+                    unlimitedAds: 'Unlimited ads',
+                    aiImprovement: 'AI improvement',
+                    statistics: 'Statistics'
+                },
+                comparison: {
+                    plan: 'Plan',
+                    price: 'Price',
+                    ads: 'Ads',
+                    period: 'Period',
+                    onetime: 'One-time'
                 }
             },
             zh: {
@@ -620,6 +654,12 @@
                     crypto: '加密貨幣',
                     stars: 'Telegram Stars'
                 },
+                paymentDescriptions: {
+                    card: 'Visa, MasterCard',
+                    crypto: 'USDT, BTC, ETH',
+                    stars: '通過 Telegram 付款'
+                },
+                paymentMethodsTitle: '💳 付款方式',
                 payButton: {
                     selectPlan: '選擇方案',
                     selectPayment: '選擇付款方式',
@@ -635,7 +675,18 @@
                     onetime: '單次購買',
                     subscription: '訂閱',
                     popular: '🔥 熱門',
-                    best: '💎 最划算'
+                    best: '💎 最划算',
+                    withUnlimited: '無限',
+                    unlimitedAds: '無限廣告',
+                    aiImprovement: 'AI 改善',
+                    statistics: '統計'
+                },
+                comparison: {
+                    plan: '方案',
+                    price: '價格',
+                    ads: '廣告數',
+                    period: '期限',
+                    onetime: '單次'
                 }
             }
         };
@@ -652,6 +703,14 @@
         document.querySelectorAll('.tab').forEach(tab => {
             const tabName = tab.dataset.tab;
             tab.textContent = t.tabs[tabName];
+        });
+        
+        // Update payment methods section
+        document.querySelector('.payment-section h3').textContent = t.paymentMethodsTitle;
+        document.querySelectorAll('.payment-method').forEach(method => {
+            const methodType = method.dataset.method;
+            method.querySelector('h4').textContent = t.paymentNames[methodType];
+            method.querySelector('p').textContent = t.paymentDescriptions[methodType];
         });
         
         // Update summary labels
@@ -741,8 +800,8 @@
                             </div>
                         </div>
                         <div class="tariff-features">
-                            <div class="feature">✨ AI ${lang === 'ru' ? 'улучшение' : lang === 'en' ? 'improvement' : '改善'}</div>
-                            <div class="feature">📊 ${lang === 'ru' ? 'Статистика' : lang === 'en' ? 'Statistics' : '統計'}</div>
+                            <div class="feature">✨ ${t.planDetails.aiImprovement}</div>
+                            <div class="feature">📊 ${t.planDetails.statistics}</div>
                             ${discount ? `<div class="feature">${discount}</div>` : ''}
                         </div>
                     </div>
@@ -761,15 +820,15 @@
                         <div class="tariff-header">
                             <div>
                                 <div class="tariff-title">${planNames[plan]}</div>
-                                <div class="tariff-description">${t.planDetails.subscription} ${lang === 'ru' ? 'с безлимитом' : lang === 'en' ? 'unlimited' : '無限'}</div>
+                                <div class="tariff-description">${t.planDetails.subscription} ${t.planDetails.withUnlimited}</div>
                             </div>
                             <div class="tariff-price">
                                 ${price} <span class="currency">${symbol}</span>
                             </div>
                         </div>
                         <div class="tariff-features">
-                            <div class="feature">∞ ${lang === 'ru' ? 'Безлимит объявлений' : lang === 'en' ? 'Unlimited ads' : '無限廣告'}</div>
-                            <div class="feature">✨ AI ${lang === 'ru' ? 'улучшение' : lang === 'en' ? 'improvement' : '改善'}</div>
+                            <div class="feature">∞ ${t.planDetails.unlimitedAds}</div>
+                            <div class="feature">✨ ${t.planDetails.aiImprovement}</div>
                             ${discount ? `<div class="feature">${discount}</div>` : ''}
                         </div>
                     </div>
@@ -844,10 +903,10 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Тариф</th>
-                            <th>Цена</th>
-                            <th>Объявлений</th>
-                            <th>Период</th>
+                            <th>${t.comparison.plan}</th>
+                            <th>${t.comparison.price}</th>
+                            <th>${t.comparison.ads}</th>
+                            <th>${t.comparison.period}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -855,7 +914,7 @@
                             const price = prices[plan][state.currency];
                             const isSubscription = ['week', 'month', 'quarter'].includes(plan);
                             const ads = isSubscription ? '∞' : plan.replace('pack', '');
-                            const period = isSubscription ? planNames[plan].split(' / ')[1] : 'Разово';
+                            const period = isSubscription ? planNames[plan].split(' / ')[1] : t.comparison.onetime;
                             
                             return `
                                 <tr>
