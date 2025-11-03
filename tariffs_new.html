@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Выбор тарифа</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1d29;
+            --bg-secondary: #242938;
+            --bg-card: #2d3142;
+            --text-primary: #e8eaed;
+            --text-secondary: #9ca3af;
+            --accent-blue: #4a90e2;
+            --accent-green: #52c41a;
+            --accent-gold: #faad14;
+            --accent-red: #ff4d4f;
+            --border-color: #3d4153;
+            --hover-bg: #353849;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px 16px 100px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Currency Selector */
+        .currency-selector {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+        }
+
+        .currency-selector h3 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .currency-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .currency-btn {
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .currency-btn:hover {
+            background: var(--hover-bg);
+        }
+
+        .currency-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: var(--bg-card);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .tab.active {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        /* Tariff Grid */
+        .tariff-grid {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tariff-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tariff-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-blue);
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+
+        .tariff-card:hover {
+            background: var(--hover-bg);
+            transform: translateY(-2px);
+        }
+
+        .tariff-card.selected {
+            border-color: var(--accent-blue);
+            background: var(--bg-secondary);
+        }
+
+        .tariff-card.selected::before {
+            transform: scaleY(1);
+        }
+
+        .tariff-card.popular {
+            border-color: var(--accent-gold);
+        }
+
+        .tariff-card.popular .badge {
+            background: var(--accent-gold);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .tariff-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .tariff-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .tariff-price {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent-blue);
+        }
+
+        .tariff-price .currency {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .tariff-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .tariff-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .feature {
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--bg-primary);
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .discount {
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+
+        /* Payment Methods */
+        .payment-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .payment-section.active {
+            display: block;
+        }
+
+        .payment-section h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .payment-methods {
+            display: grid;
+            gap: 12px;
+        }
+
+        .payment-method {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .payment-method:hover {
+            background: var(--hover-bg);
+        }
+
+        .payment-method.selected {
+            border-color: var(--accent-blue);
+            background: var(--bg-primary);
+        }
+
+        .payment-icon {
+            font-size: 24px;
+        }
+
+        .payment-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .payment-info p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Summary */
+        .summary {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .summary.active {
+            display: block;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .summary-row.total {
+            font-size: 20px;
+            font-weight: 700;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-color);
+            color: var(--accent-blue);
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .pay-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-green) 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        .pay-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+        }
+
+        .pay-button:disabled {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .comparison-table {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+        }
+
+        .comparison-table th {
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .hide {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💎 Выберите тариф</h1>
+            <p>Все тарифы включают AI улучшение и публикацию</p>
+        </div>
+
+        <!-- Currency Selector -->
+        <div class="currency-selector">
+            <h3>💱 Валюта</h3>
+            <div class="currency-buttons">
+                <button class="currency-btn active" data-currency="RUB">₽ RUB</button>
+                <button class="currency-btn" data-currency="USD">$ USD</button>
+                <button class="currency-btn" data-currency="USDT">₮ USDT</button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="onetime">📦 Разовые</button>
+            <button class="tab" data-tab="subscription">⭐ Подписки</button>
+            <button class="tab" data-tab="comparison">📊 Сравнение</button>
+        </div>
+
+        <!-- One-time Plans -->
+        <div id="onetime-plans" class="tariff-grid">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Subscription Plans -->
+        <div id="subscription-plans" class="tariff-grid hide">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Comparison Table -->
+        <div id="comparison-table" class="comparison-table hide">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="payment-section" id="payment-section">
+            <h3>💳 Способ оплаты</h3>
+            <div class="payment-methods">
+                <div class="payment-method" data-method="card">
+                    <div class="payment-icon">💳</div>
+                    <div class="payment-info">
+                        <h4>Банковская карта</h4>
+                        <p>Visa, MasterCard, Мир</p>
+                    </div>
+                </div>
+                <div class="payment-method" data-method="crypto">
+                    <div class="payment-icon">₿</div>
+                    <div class="payment-info">
+                        <h4>Криптовалюта</h4>
+                        <p>USDT, BTC, ETH</p>
+                    </div>
+                </div>
+                <div class="payment-method" data-method="stars">
+                    <div class="payment-icon">⭐</div>
+                    <div class="payment-info">
+                        <h4>Telegram Stars</h4>
+                        <p>Оплата через Telegram</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary" id="summary">
+            <div class="summary-row">
+                <span>Тариф:</span>
+                <span id="summary-plan">-</span>
+            </div>
+            <div class="summary-row">
+                <span>Способ оплаты:</span>
+                <span id="summary-payment">-</span>
+            </div>
+            <div class="summary-row total">
+                <span>К оплате:</span>
+                <span id="summary-total">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+        <button class="pay-button" id="pay-button" disabled>
+            Выберите тариф
+        </button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.BackButton.show();
+        
+        // Prices
+        const prices = {
+            pack1: { RUB: 200, USD: 3, USDT: 3 },
+            pack5: { RUB: 900, USD: 13, USDT: 13 },
+            pack10: { RUB: 1600, USD: 24, USDT: 24 },
+            pack20: { RUB: 3000, USD: 45, USDT: 45 },
+            pack30: { RUB: 4200, USD: 63, USDT: 63 },
+            week: { RUB: 800, USD: 12, USDT: 12 },
+            month: { RUB: 2500, USD: 37, USDT: 37 },
+            quarter: { RUB: 6000, USD: 90, USDT: 90 }
+        };
+
+        const planNames = {
+            pack1: '1 объявление',
+            pack5: '5 объявлений',
+            pack10: '10 объявлений',
+            pack20: '20 объявлений',
+            pack30: '30 объявлений',
+            week: 'Безлимит / Неделя',
+            month: 'Безлимит / Месяц',
+            quarter: 'Безлимит / 3 месяца'
+        };
+
+        const paymentNames = {
+            card: 'Банковская карта',
+            crypto: 'Криптовалюта',
+            stars: 'Telegram Stars'
+        };
+
+        let state = {
+            currency: 'RUB',
+            selectedPlan: null,
+            selectedPayment: null
+        };
+
+        // Currency switching
+        document.querySelectorAll('.currency-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.currency = btn.dataset.currency;
+                renderPlans();
+                updateSummary();
+            });
+        });
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const tabName = tab.dataset.tab;
+                document.getElementById('onetime-plans').classList.add('hide');
+                document.getElementById('subscription-plans').classList.add('hide');
+                document.getElementById('comparison-table').classList.add('hide');
+                
+                if (tabName === 'onetime') {
+                    document.getElementById('onetime-plans').classList.remove('hide');
+                } else if (tabName === 'subscription') {
+                    document.getElementById('subscription-plans').classList.remove('hide');
+                } else if (tabName === 'comparison') {
+                    document.getElementById('comparison-table').classList.remove('hide');
+                    renderComparison();
+                }
+            });
+        });
+
+        // Render plans
+        function renderPlans() {
+            const onetimePlans = ['pack1', 'pack5', 'pack10', 'pack20', 'pack30'];
+            const subscriptionPlans = ['week', 'month', 'quarter'];
+            
+            const symbol = state.currency === 'RUB' ? '₽' : state.currency === 'USD' ? '$' : '₮';
+            
+            // Render one-time plans
+            const onetimeContainer = document.getElementById('onetime-plans');
+            onetimeContainer.innerHTML = onetimePlans.map((plan, index) => {
+                const price = prices[plan][state.currency];
+                const isPopular = plan === 'pack10';
+                const discount = index > 0 ? `<span class="discount">-${10 + index * 5}%</span>` : '';
+                
+                return `
+                    <div class="tariff-card ${isPopular ? 'popular' : ''}" data-plan="${plan}">
+                        ${isPopular ? '<div class="badge">🔥 Популярный</div>' : ''}
+                        <div class="tariff-header">
+                            <div>
+                                <div class="tariff-title">${planNames[plan]}</div>
+                                <div class="tariff-description">Разовая покупка</div>
+                            </div>
+                            <div class="tariff-price">
+                                ${price} <span class="currency">${symbol}</span>
+                            </div>
+                        </div>
+                        <div class="tariff-features">
+                            <div class="feature">✨ AI улучшение</div>
+                            <div class="feature">📊 Статистика</div>
+                            ${discount ? `<div class="feature">${discount}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Render subscription plans
+            const subscriptionContainer = document.getElementById('subscription-plans');
+            subscriptionContainer.innerHTML = subscriptionPlans.map((plan, index) => {
+                const price = prices[plan][state.currency];
+                const discount = index > 0 ? `<span class="discount">-${20 + index * 10}%</span>` : '';
+                
+                return `
+                    <div class="tariff-card ${plan === 'month' ? 'popular' : ''}" data-plan="${plan}">
+                        ${plan === 'month' ? '<div class="badge">⭐ Лучший выбор</div>' : ''}
+                        <div class="tariff-header">
+                            <div>
+                                <div class="tariff-title">${planNames[plan]}</div>
+                                <div class="tariff-description">Подписка с безлимитом</div>
+                            </div>
+                            <div class="tariff-price">
+                                ${price} <span class="currency">${symbol}</span>
+                            </div>
+                        </div>
+                        <div class="tariff-features">
+                            <div class="feature">∞ Безлимит объявлений</div>
+                            <div class="feature">✨ AI улучшение</div>
+                            ${discount ? `<div class="feature">${discount}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Add click handlers
+            document.querySelectorAll('.tariff-card').forEach(card => {
+                card.addEventListener('click', () => selectPlan(card.dataset.plan));
+            });
+        }
+
+        // Select plan
+        function selectPlan(plan) {
+            state.selectedPlan = plan;
+            document.querySelectorAll('.tariff-card').forEach(c => c.classList.remove('selected'));
+            document.querySelector(`[data-plan="${plan}"]`).classList.add('selected');
+            document.getElementById('payment-section').classList.add('active');
+            updateButton();
+            updateSummary();
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        // Payment method selection
+        document.querySelectorAll('.payment-method').forEach(method => {
+            method.addEventListener('click', () => {
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                method.classList.add('selected');
+                state.selectedPayment = method.dataset.method;
+                updateButton();
+                updateSummary();
+                tg.HapticFeedback.impactOccurred('light');
+            });
+        });
+
+        // Update button
+        function updateButton() {
+            const button = document.getElementById('pay-button');
+            if (state.selectedPlan && state.selectedPayment) {
+                const price = prices[state.selectedPlan][state.currency];
+                const symbol = state.currency === 'RUB' ? '₽' : state.currency === 'USD' ? '$' : '₮';
+                button.textContent = `Оплатить ${price} ${symbol}`;
+                button.disabled = false;
+            } else if (state.selectedPlan) {
+                button.textContent = 'Выберите способ оплаты';
+                button.disabled = true;
+            } else {
+                button.textContent = 'Выберите тариф';
+                button.disabled = true;
+            }
+        }
+
+        // Update summary
+        function updateSummary() {
+            if (state.selectedPlan) {
+                const price = prices[state.selectedPlan][state.currency];
+                const symbol = state.currency === 'RUB' ? '₽' : state.currency === 'USD' ? '$' : '₮';
+                
+                document.getElementById('summary').classList.add('active');
+                document.getElementById('summary-plan').textContent = planNames[state.selectedPlan];
+                document.getElementById('summary-payment').textContent = state.selectedPayment ? paymentNames[state.selectedPayment] : '-';
+                document.getElementById('summary-total').textContent = `${price} ${symbol}`;
+            }
+        }
+
+        // Render comparison table
+        function renderComparison() {
+            const allPlans = ['pack1', 'pack5', 'pack10', 'pack20', 'pack30', 'week', 'month', 'quarter'];
+            const symbol = state.currency === 'RUB' ? '₽' : state.currency === 'USD' ? '$' : '₮';
+            
+            const table = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Тариф</th>
+                            <th>Цена</th>
+                            <th>Объявлений</th>
+                            <th>Период</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allPlans.map(plan => {
+                            const price = prices[plan][state.currency];
+                            const isSubscription = ['week', 'month', 'quarter'].includes(plan);
+                            const ads = isSubscription ? '∞' : plan.replace('pack', '');
+                            const period = isSubscription ? planNames[plan].split(' / ')[1] : 'Разово';
+                            
+                            return `
+                                <tr>
+                                    <td>${planNames[plan]}</td>
+                                    <td><strong>${price} ${symbol}</strong></td>
+                                    <td>${ads}</td>
+                                    <td>${period}</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('comparison-table').innerHTML = table;
+        }
+
+        // Pay button
+        document.getElementById('pay-button').addEventListener('click', () => {
+            if (state.selectedPlan && state.selectedPayment) {
+                tg.HapticFeedback.notificationOccurred('success');
+                
+                // Send data back to bot
+                const data = {
+                    plan: state.selectedPlan,
+                    currency: state.currency.toLowerCase(),
+                    payment_method: state.selectedPayment,
+                    amount: prices[state.selectedPlan][state.currency]
+                };
+                
+                tg.sendData(JSON.stringify(data));
+            }
+        });
+
+        // Back button
+        tg.BackButton.onClick(() => {
+            tg.close();
+        });
+
+        // Initialize
+        renderPlans();
+        renderComparison();
+    </script>
+</body>
+</html>
