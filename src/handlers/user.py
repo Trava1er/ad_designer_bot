@@ -201,40 +201,6 @@ async def handle_ai_continue(message: Message, state: FSMContext):
 
 
 @router.message(UserStates.ai_result_confirmation, F.text.in_(KeyboardLoader.get_button_texts_all_langs("ai_result_confirmation", (1, 0))))
-async def show_ai_comparison(message: Message, state: FSMContext):
-    """Show comparison between original and AI-improved text."""
-    user_id, language = await get_user_info_from_message(message, get_db_session, get_or_create_user)
-    if not user_id:
-        return
-    
-    # Get both original and improved text from state
-    state_data = await state.get_data()
-    original_text = state_data.get("original_ad_text", state_data.get("ad_text", ""))
-    improved_text = state_data.get("ad_text", "")
-    
-    # Calculate character counts
-    original_chars = len(original_text)
-    improved_chars = len(improved_text)
-    
-    # Get comparison message
-    comparison_text = MessageLoader.get_message("ad_creation.ai_comparison", language,
-        original_text=original_text,
-        improved_text=improved_text,
-        original_chars=original_chars,
-        improved_chars=improved_chars
-    )
-    
-    # Show comparison with same keyboard to allow continuing
-    await message.answer(
-        comparison_text,
-        reply_markup=get_ai_result_keyboard(language),
-        parse_mode="HTML"
-    )
-
-
-
-
-@router.message(UserStates.ai_result_confirmation, F.text.in_(KeyboardLoader.get_button_texts_all_langs("ai_result_confirmation", (2, 0))))
 async def handle_ai_edit(message: Message, state: FSMContext):
     """Allow user to manually edit the improved text."""
     user_id, language = await get_user_info_from_message(message, get_db_session, get_or_create_user)
@@ -252,57 +218,6 @@ async def handle_ai_edit(message: Message, state: FSMContext):
     await message.answer(f"```\n{current_text}\n```", parse_mode="Markdown")
     
     await state.set_state(UserStates.waiting_for_ad_content)
-
-
-
-
-@router.message(UserStates.ai_result_confirmation, F.text.in_(KeyboardLoader.get_button_texts_all_langs("ai_result_confirmation", (3, 0))))
-async def handle_ai_retry(message: Message, state: FSMContext):
-    """Re-run AI improvement on the original text."""
-    user_id, language = await get_user_info_from_message(message, get_db_session, get_or_create_user)
-    if not user_id:
-        return
-    
-    data = await state.get_data()
-    # Get original text (stored before AI improvement)
-    original_text = data.get("original_ad_text", data.get("ad_text", ""))
-    
-    # Show processing message
-    processing_text = MessageLoader.get_message("ad_creation.processing_ai", language)
-    processing_msg = await message.answer(processing_text)
-    
-    try:
-        # Improve text with AI
-        if settings.openai_api_key:
-            improved_text = await process_ai_improvement(ai_service, original_text, language)
-            
-            if not improved_text:
-                improved_text = original_text
-            
-            # Save to state
-            await state.update_data(ad_text=improved_text)
-            await safe_delete_message(processing_msg)
-            
-            # Show AI result with image using utility
-            await show_ai_result_with_image(
-                message, improved_text, language, data, get_ai_result_keyboard
-            )
-            
-            await state.set_state(UserStates.ai_result_confirmation)
-            
-        else:
-            # AI not configured
-            await safe_delete_message(processing_msg)
-            fallback_text = MessageLoader.get_message("ad_creation.ai_not_configured", language)
-            await message.answer(fallback_text, reply_markup=get_tariff_selection_keyboard(language))
-            await state.set_state(UserStates.tariff_selection)
-            
-    except Exception as e:
-        logger.error(f"Error in AI retry: {e}", exc_info=True)
-        await safe_delete_message(processing_msg)
-        error_text = MessageLoader.get_message("errors.processing_error", language)
-        await message.answer(error_text, reply_markup=get_main_menu_keyboard(language))
-        await state.clear()
 
 
 # ========================= TARIFF & PAYMENT HANDLERS (TEXT-BASED) =========================
