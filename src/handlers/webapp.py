@@ -58,13 +58,56 @@ async def handle_webapp_data(message: Message, state: FSMContext):
         ad_format = data.get("format")  # "text", "image", "video", "combined"
         duration = data.get("duration", 30)  # 1-90 days
         
-        # Calculate amount from tariff prices
+        # Validate tariff
+        valid_tariffs = ["basic", "standard", "premium"]
+        if plan_id not in valid_tariffs:
+            logger.warning(f"Invalid tariff received: {plan_id}")
+            user_id, language = await get_user_info_from_message(
+                message, 
+                get_db_session, 
+                get_or_create_user
+            )
+            error_text = MessageLoader.get_message("errors.invalid_tariff", language)
+            await message.answer(error_text)
+            return
+        
+        # Validate currency
+        valid_currencies = ["RUB", "USD", "CNY"]
+        if currency not in valid_currencies:
+            logger.warning(f"Invalid currency received: {currency}")
+            currency = "RUB"  # Default fallback
+        
+        # Validate payment method
+        valid_payment_methods = ["stars", "card", "crypto"]
+        if payment_method not in valid_payment_methods:
+            logger.warning(f"Invalid payment method received: {payment_method}")
+            user_id, language = await get_user_info_from_message(
+                message, 
+                get_db_session, 
+                get_or_create_user
+            )
+            error_text = MessageLoader.get_message("errors.invalid_tariff", language)
+            await message.answer(error_text)
+            return
+        
+        # Calculate amount from tariff prices (should match pricing_config.json)
         tariff_prices = {
             "basic": {"RUB": 500, "USD": 6, "CNY": 40},
             "standard": {"RUB": 1200, "USD": 14, "CNY": 95},
             "premium": {"RUB": 2500, "USD": 30, "CNY": 200}
         }
         amount = tariff_prices.get(plan_id, {}).get(currency, 0)
+        
+        if amount == 0:
+            logger.error(f"Invalid amount calculated for tariff {plan_id} and currency {currency}")
+            user_id, language = await get_user_info_from_message(
+                message, 
+                get_db_session, 
+                get_or_create_user
+            )
+            error_text = MessageLoader.get_message("errors.invalid_tariff", language)
+            await message.answer(error_text)
+            return
         
         # Get user info
         user_id, language = await get_user_info_from_message(
