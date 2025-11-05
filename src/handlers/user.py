@@ -164,16 +164,34 @@ async def process_keep_as_is(message: Message, state: FSMContext):
 @router.message(UserStates.ai_result_confirmation, F.text.in_(KeyboardLoader.get_button_texts_all_langs("ai_result_confirmation", (0, 0))))
 async def handle_ai_continue(message: Message, state: FSMContext):
     """Proceed to tariff selection with current (improved) text."""
+    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
+    
     user_id, language = await get_user_info_from_message(message, get_db_session, get_or_create_user)
     if not user_id:
         return
     
-    # Show message to open Web App
+    # Prepare Web App URL with language parameter
+    webapp_url = f"https://trava1er.github.io/ad_designer_bot/unified_order.html?lang={language}"
+    
+    # Get approval message
     approval_text = MessageLoader.get_message("ad_creation.text_approved", language)
     
+    # Create inline keyboard with Web App button
+    button_texts = {
+        "ru": "🚀 Оформить заказ",
+        "en": "🚀 Place Order",
+        "zh-tw": "🚀 下訂單"
+    }
+    button_text = button_texts.get(language, button_texts["ru"])
+    
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text=button_text, web_app=WebAppInfo(url=webapp_url))]
+    ])
+    
+    # Send message with Web App button
     await message.answer(
         approval_text,
-        reply_markup=get_tariff_selection_keyboard(language),
+        reply_markup=keyboard,
         parse_mode="HTML"
     )
     
