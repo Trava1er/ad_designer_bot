@@ -1223,8 +1223,17 @@
             stepEl.classList.remove('completed');
             stepEl.classList.add('active');
             
-            // Scroll to step
-            stepEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Scroll to step with offset for sticky progress bar
+            setTimeout(() => {
+                const progressBarHeight = document.querySelector('.progress-bar').offsetHeight;
+                const elementPosition = stepEl.getBoundingClientRect().top + window.scrollY;
+                const offsetPosition = elementPosition - progressBarHeight - 20; // 20px extra padding
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }, 100);
             
             // Update progress
             updateProgress();
