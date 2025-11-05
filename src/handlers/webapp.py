@@ -43,10 +43,28 @@ async def handle_webapp_data(message: Message, state: FSMContext):
             return
         
         data = json.loads(message.web_app_data.data)
-        plan_id = data.get("plan")  # e.g., "pack10", "week", "month"
-        currency = data.get("currency", "rub").upper()  # e.g., "RUB", "USD", "USDT"
-        payment_method = data.get("payment_method")  # "card", "crypto", "stars"
-        amount = data.get("amount")  # Price from Web App
+        
+        # New unified order data structure
+        plan_id = data.get("tariff")  # "basic", "standard", "premium"
+        currency = data.get("currency", "RUB").upper()
+        payment_method = data.get("payment")  # "card", "crypto", "stars"
+        
+        # Additional criteria from unified order page
+        placement_type = data.get("placementType")  # "onetime", "subscription"
+        publication_time = data.get("publicationTime")  # "immediate", "scheduled"
+        scheduled_time = data.get("scheduledTime")  # e.g., "12:00" if scheduled
+        pinning = data.get("pinning")  # "yes", "no"
+        pin_duration = data.get("pinDuration")  # 1, 3, 7 (days) if pinning is yes
+        ad_format = data.get("format")  # "text", "image", "video", "combined"
+        duration = data.get("duration", 30)  # 1-90 days
+        
+        # Calculate amount from tariff prices
+        tariff_prices = {
+            "basic": {"RUB": 500, "USD": 6, "CNY": 40},
+            "standard": {"RUB": 1200, "USD": 14, "CNY": 95},
+            "premium": {"RUB": 2500, "USD": 30, "CNY": 200}
+        }
+        amount = tariff_prices.get(plan_id, {}).get(currency, 0)
         
         # Get user info
         user_id, language = await get_user_info_from_message(
@@ -55,9 +73,21 @@ async def handle_webapp_data(message: Message, state: FSMContext):
             get_or_create_user
         )
         
-        # Get localized plan and payment method names
-        plan_name = MessageLoader.get_message(f"tariff_plans.{plan_id}", language)
-        payment_name = MessageLoader.get_message(f"payment_methods.{payment_method}", language)
+        # Get localized tariff name
+        tariff_names = {
+            "ru": {"basic": "Базовый", "standard": "Стандарт", "premium": "Премиум"},
+            "en": {"basic": "Basic", "standard": "Standard", "premium": "Premium"},
+            "zh-tw": {"basic": "基本", "standard": "標準", "premium": "高級"}
+        }
+        plan_name = tariff_names.get(language, tariff_names["ru"]).get(plan_id, plan_id)
+        
+        # Get localized payment method name
+        payment_names = {
+            "ru": {"stars": "Telegram Stars", "card": "Банковская карта", "crypto": "Криптовалюта"},
+            "en": {"stars": "Telegram Stars", "card": "Bank Card", "crypto": "Cryptocurrency"},
+            "zh-tw": {"stars": "Telegram Stars", "card": "銀行卡", "crypto": "加密貨幣"}
+        }
+        payment_name = payment_names.get(language, payment_names["ru"]).get(payment_method, payment_method)
         
         # Validate
         if not plan_id or not payment_method or not amount:
@@ -71,7 +101,15 @@ async def handle_webapp_data(message: Message, state: FSMContext):
             selected_plan_name=plan_name,
             currency=currency,
             amount=amount,
-            payment_method=payment_method
+            payment_method=payment_method,
+            # New placement criteria
+            placement_type=placement_type,
+            publication_time=publication_time,
+            scheduled_time=scheduled_time,
+            pinning=pinning,
+            pin_duration=pin_duration,
+            ad_format=ad_format,
+            duration=duration
         )
         
         # Get ad text from state

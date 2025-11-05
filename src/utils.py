@@ -543,8 +543,8 @@ def get_tariff_selection_keyboard(language: str = "ru", currency: str = "RUB") -
     
     builder = ReplyKeyboardBuilder()
     
-    # Web App URL with language parameter
-    webapp_url = f"https://trava1er.github.io/ad_designer_bot/tariffs_new.html?lang={language}"
+    # Web App URL with language parameter - unified order page
+    webapp_url = f"https://trava1er.github.io/ad_designer_bot/unified_order.html?lang={language}"
     
     if language == "ru":
         builder.row(KeyboardButton(
@@ -690,12 +690,18 @@ async def process_ai_improvement(
             logger.warning("OpenAI API key not configured")
             return None
         
+        logger.info(f"Starting AI improvement for text ({len(original_text)} chars)")
+        
         # First improvement attempt
         prompt = MessageLoader.get_message(prompt_key, language, text=original_text)
+        logger.info(f"Generated prompt for AI (first {100} chars): {prompt[:100]}...")
+        
         improved_text = await ai_service.generate_text(prompt, language)
+        logger.info(f"AI returned text ({len(improved_text) if improved_text else 0} chars): {improved_text[:100] if improved_text else 'None'}...")
         
         # Check if improvement was successful
         if not improved_text or improved_text in ["Ошибка генерации текста", "Text generation error", "文本生成錯誤"]:
+            logger.warning("AI improvement failed - returned error or None")
             return None
         
         # Check text length and automatically shorten if needed
@@ -705,6 +711,9 @@ async def process_ai_improvement(
         while len(improved_text) > 950 and retry_count < max_retries:
             logger.info(f"Text too long ({len(improved_text)} chars), shortening... (attempt {retry_count + 1}/{max_retries})")
             
+            # Save current text before attempting shortening
+            previous_text = improved_text
+            
             # Use shorten prompt
             shorten_prompt = MessageLoader.get_message(
                 "ai_prompts.shorten_text", 
@@ -712,14 +721,15 @@ async def process_ai_improvement(
                 text=improved_text,
                 length=len(improved_text)
             )
-            improved_text = await ai_service.generate_text(shorten_prompt, language)
+            shortened_text = await ai_service.generate_text(shorten_prompt, language)
             
-            if not improved_text or improved_text in ["Ошибка генерации текста", "Text generation error", "文本生成錯誤"]:
+            if not shortened_text or shortened_text in ["Ошибка генерации текста", "Text generation error", "文本生成錯誤"]:
                 # If shortening failed, truncate manually as last resort
                 logger.warning("AI shortening failed, truncating manually")
-                improved_text = improved_text[:947] + "..."
+                improved_text = previous_text[:947] + "..."
                 break
             
+            improved_text = shortened_text
             retry_count += 1
         
         # Final check - if still too long after retries, truncate
