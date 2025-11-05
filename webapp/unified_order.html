@@ -1364,6 +1364,42 @@
 
         // Main button handler
         tg.MainButton.onClick(() => {
+            // Validate all required fields
+            const missing = [];
+            
+            if (!selectedData.tariff) {
+                missing.push(userLang === 'ru' ? 'Тариф' : userLang === 'en' ? 'Tariff' : '資費');
+            }
+            if (!selectedData.placementType) {
+                missing.push(userLang === 'ru' ? 'Тип размещения' : userLang === 'en' ? 'Placement type' : '投放類型');
+            }
+            if (!selectedData.publicationTime) {
+                missing.push(userLang === 'ru' ? 'Время публикации' : userLang === 'en' ? 'Publication time' : '發布時間');
+            }
+            if (selectedData.publicationTime === 'scheduled' && !selectedData.scheduledTime) {
+                missing.push(userLang === 'ru' ? 'Дата и время' : userLang === 'en' ? 'Date and time' : '日期和時間');
+            }
+            if (!selectedData.pinning) {
+                missing.push(userLang === 'ru' ? 'Закрепление' : userLang === 'en' ? 'Pinning' : '置頂');
+            }
+            if (!selectedData.format) {
+                missing.push(userLang === 'ru' ? 'Формат' : userLang === 'en' ? 'Format' : '格式');
+            }
+            if (!selectedData.payment) {
+                missing.push(userLang === 'ru' ? 'Способ оплаты' : userLang === 'en' ? 'Payment method' : '支付方式');
+            }
+            
+            if (missing.length > 0) {
+                const headers = {
+                    'ru': 'Не выбрано для оплаты:',
+                    'en': 'Not selected for payment:',
+                    'zh-tw': '未選擇支付：'
+                };
+                const message = `${headers[userLang]}\n\n• ${missing.join('\n• ')}`;
+                tg.showAlert(message);
+                return;
+            }
+            
             tg.sendData(JSON.stringify(selectedData));
         });
 
