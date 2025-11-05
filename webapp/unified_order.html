@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Оформление заказа</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1d29;
+            --bg-secondary: #242938;
+            --bg-card: #2d3142;
+            --text-primary: #e8eaed;
+            --text-secondary: #9ca3af;
+            --accent-blue: #4a90e2;
+            --accent-green: #52c41a;
+            --accent-gold: #faad14;
+            --accent-purple: #9254de;
+            --accent-red: #ff4d4f;
+            --border-color: #3d4153;
+            --hover-bg: #353849;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px 16px 140px;
+        }
+
+        /* Progress Bar - Sticky */
+        .progress-bar {
+            position: sticky;
+            top: 0;
+            background: var(--bg-primary);
+            padding: 16px;
+            margin: -20px -16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .progress-count {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .progress-track {
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-green) 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 3px;
+        }
+
+        /* Section Styling */
+        .section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 24px 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            opacity: 0.5;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .section.active {
+            opacity: 1;
+            pointer-events: auto;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 1px var(--accent-blue);
+        }
+
+        .section.completed {
+            opacity: 0.8;
+            pointer-events: none;
+            border-color: var(--accent-green);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .section.active .section-number {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .section.completed .section-number {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .section-title {
+            flex: 1;
+        }
+
+        .section-title h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .help-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--accent-blue);
+            transition: all 0.2s;
+        }
+
+        .help-icon:hover {
+            background: var(--accent-blue);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Tariff Cards */
+        .tariff-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .tariff-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .tariff-card:hover {
+            background: var(--hover-bg);
+            transform: translateY(-2px);
+        }
+
+        .tariff-card.selected {
+            border-color: var(--accent-blue);
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(82, 196, 26, 0.1) 100%);
+        }
+
+        .tariff-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 28px;
+            height: 28px;
+            background: var(--accent-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .tariff-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .tariff-badge.basic {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .tariff-badge.standard {
+            background: var(--accent-gold);
+            color: white;
+        }
+
+        .tariff-badge.premium {
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        .tariff-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .tariff-price {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: 16px;
+        }
+
+        .tariff-price small {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .tariff-features {
+            list-style: none;
+        }
+
+        .tariff-features li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tariff-features li::before {
+            content: '✓';
+            color: var(--accent-green);
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* Option Buttons */
+        .option-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent-blue);
+        }
+
+        .option-btn.selected {
+            border-color: var(--accent-blue);
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.15) 0%, rgba(82, 196, 26, 0.15) 100%);
+        }
+
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .option-btn.selected .option-icon {
+            background: var(--accent-blue);
+        }
+
+        .option-content {
+            flex: 1;
+        }
+
+        .option-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .option-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Time Picker */
+        .time-picker-container {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            display: none;
+        }
+
+        .time-picker-container.visible {
+            display: block;
+        }
+
+        .time-input-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .time-input {
+            width: 70px;
+            padding: 12px;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .time-separator {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .suggested-times {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .time-quick-btn {
+            padding: 8px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .time-quick-btn:hover {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        /* Pin Duration */
+        .pin-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .pin-btn {
+            padding: 14px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .pin-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent-blue);
+        }
+
+        .pin-btn.selected {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .pin-btn-label {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .pin-btn-desc {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        /* Slider */
+        .slider-container {
+            padding: 20px 16px;
+        }
+
+        .slider-value {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .slider-number {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 4px;
+        }
+
+        .slider-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--bg-secondary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.5);
+        }
+
+        /* Summary */
+        .summary-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .summary-item {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .summary-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .summary-total {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-green) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 16px;
+        }
+
+        .summary-total-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .summary-total-price {
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        /* Payment Methods */
+        .payment-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .payment-btn {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 14px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .payment-btn:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent-blue);
+        }
+
+        .payment-btn.selected {
+            border-color: var(--accent-green);
+            background: linear-gradient(135deg, rgba(82, 196, 26, 0.15) 0%, rgba(82, 196, 26, 0.1) 100%);
+        }
+
+        .payment-icon {
+            width: 52px;
+            height: 52px;
+            background: var(--bg-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .payment-btn.selected .payment-icon {
+            background: var(--accent-green);
+        }
+
+        .payment-content {
+            flex: 1;
+        }
+
+        .payment-name {
+            font-size: 17px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .payment-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Currency Selector */
+        .currency-selector {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .currency-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .currency-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .currency-btn {
+            padding: 10px;
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .currency-btn:hover {
+            background: var(--hover-bg);
+        }
+
+        .currency-btn.selected {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            max-width: 280px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+        }
+
+        .tooltip.show {
+            display: block;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section.active {
+            animation: slideIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-container">
+            <span class="progress-text" id="progressText">Выбор тарифа</span>
+            <span class="progress-count"><span id="currentStep">0</span>/7</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Step 1: Tariff Selection -->
+        <div class="section active" id="step1">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <div class="section-title">
+                    <h2 id="step1Title">Выберите тариф</h2>
+                    <p id="step1Desc">Базовый пакет или расширенные возможности</p>
+                </div>
+                <div class="help-icon" onclick="showTooltip(event, 'tariff')">?</div>
+            </div>
+
+            <div class="currency-selector">
+                <div class="currency-label" id="currencyLabel">Валюта</div>
+                <div class="currency-buttons">
+                    <div class="currency-btn selected" data-currency="RUB" onclick="selectCurrency('RUB')">₽ RUB</div>
+                    <div class="currency-btn" data-currency="USD" onclick="selectCurrency('USD')">$ USD</div>
+                    <div class="currency-btn" data-currency="CNY" onclick="selectCurrency('CNY')">¥ CNY</div>
+                </div>
+            </div>
+
+            <div class="tariff-grid">
+                <div class="tariff-card" onclick="selectTariff('basic')">
+                    <div class="tariff-badge basic">BASIC</div>
+                    <div class="tariff-name" data-i18n="tariff.basic.name">Базовый</div>
+                    <div class="tariff-price">
+                        <span id="basicPrice">500</span> <small id="basicCurrency">₽</small>
+                    </div>
+                    <ul class="tariff-features">
+                        <li data-i18n="tariff.basic.feat1">1 канал размещения</li>
+                        <li data-i18n="tariff.basic.feat2">Публикация 1 объявления</li>
+                        <li data-i18n="tariff.basic.feat3">Статистика просмотров</li>
+                    </ul>
+                </div>
+
+                <div class="tariff-card" onclick="selectTariff('standard')">
+                    <div class="tariff-badge standard">STANDARD</div>
+                    <div class="tariff-name" data-i18n="tariff.standard.name">Стандарт</div>
+                    <div class="tariff-price">
+                        <span id="standardPrice">1200</span> <small id="standardCurrency">₽</small>
+                    </div>
+                    <ul class="tariff-features">
+                        <li data-i18n="tariff.standard.feat1">3 канала размещения</li>
+                        <li data-i18n="tariff.standard.feat2">Публикация 3 объявлений</li>
+                        <li data-i18n="tariff.standard.feat3">Приоритетная поддержка</li>
+                        <li data-i18n="tariff.standard.feat4">Детальная аналитика</li>
+                    </ul>
+                </div>
+
+                <div class="tariff-card" onclick="selectTariff('premium')">
+                    <div class="tariff-badge premium">PREMIUM</div>
+                    <div class="tariff-name" data-i18n="tariff.premium.name">Премиум</div>
+                    <div class="tariff-price">
+                        <span id="premiumPrice">2500</span> <small id="premiumCurrency">₽</small>
+                    </div>
+                    <ul class="tariff-features">
+                        <li data-i18n="tariff.premium.feat1">10 каналов размещения</li>
+                        <li data-i18n="tariff.premium.feat2">Безлимит объявлений</li>
+                        <li data-i18n="tariff.premium.feat3">VIP поддержка 24/7</li>
+                        <li data-i18n="tariff.premium.feat4">Расширенная аналитика</li>
+                        <li data-i18n="tariff.premium.feat5">Автопродвижение</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Placement Type -->
+        <div class="section" id="step2">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <div class="section-title">
+                    <h2 id="step2Title">Тип размещения</h2>
+                    <p id="step2Desc">Разовое или регулярное размещение</p>
+                </div>
+                <div class="help-icon" onclick="showTooltip(event, 'placement')">?</div>
+            </div>
+            <div class="option-grid">
+                <div class="option-btn" onclick="selectPlacementType('onetime')">
+                    <div class="option-icon">📌</div>
+                    <div class="option-content">
+                        <div class="option-title" data-i18n="placement.onetime.title">Разовое</div>
+                        <div class="option-desc" data-i18n="placement.onetime.desc">Одна публикация объявления</div>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectPlacementType('subscription')">
+                    <div class="option-icon">🔄</div>
+                    <div class="option-content">
+                        <div class="option-title" data-i18n="placement.subscription.title">Подписка</div>
+                        <div class="option-desc" data-i18n="placement.subscription.desc">Регулярные публикации</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Publication Time -->
+        <div class="section" id="step3">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <div class="section-title">
+                    <h2 id="step3Title">Время публикации</h2>
+                    <p id="step3Desc">Сейчас или запланировать</p>
+                </div>
+                <div class="help-icon" onclick="showTooltip(event, 'time')">?</div>
+            </div>
+            <div class="option-grid">
+                <div class="option-btn" onclick="selectPublicationTime('immediate')">
+                    <div class="option-icon">⚡</div>
+                    <div class="option-content">
+                        <div class="option-title" data-i18n="time.immediate.title">Сейчас</div>
+                        <div class="option-desc" data-i18n="time.immediate.desc">Опубликовать немедленно</div>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectPublicationTime('scheduled')">
+                    <div class="option-icon">⏰</div>
+                    <div class="option-content">
+                        <div class="option-title" data-i18n="time.scheduled.title">Запланировать</div>
+                        <div class="option-desc" data-i18n="time.scheduled.desc">Выбрать дату и время</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="time-picker-container" id="timePicker">
+                <div class="time-input-group">
+                    <input type="number" class="time-input" id="hours" min="0" max="23" value="12" placeholder="ЧЧ">
+                    <span class="time-separator">:</span>
+                    <input type="number" class="time-input" id="minutes" min="0" max="59" value="00" placeholder="ММ">
+                </div>
+                <div class="suggested-times">
+                    <div class="time-quick-btn" onclick="setTime(9, 0)">09:00</div>
+                    <div class="time-quick-btn" onclick="setTime(12, 0)">12:00</div>
+                    <div class="time-quick-btn" onclick="setTime(15, 0)">15:00</div>
+                    <div class="time-quick-btn" onclick="setTime(18, 0)">18:00</div>
+                    <div class="time-quick-btn" onclick="setTime(21, 0)">21:00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Pinning -->
+        <div class="section" id="step4">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <div class="section-title">
+                    <h2 id="step4Title">Закрепление</h2>
+                    <p id="step4Desc">Сделать объявление заметнее</p>
+                </div>
+                <div class="help-icon" onclick="showTooltip(event, 'pin')">?</div>
+            </div>
+            <div class="option-grid">
+                <div class="option-btn" onclick="selectPinning('no')">
+                    <div class="option-icon">➖</div>
+                    <div class="option-content">
+                        <div class="option-title" data-i18n="pin.no.title">Не закреплять</div>
+                        <div class="option-desc" data-i18n="pin.no.desc">Обычная публикация</div>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectPinning('yes')">
+                    <div class="option-icon">📍</div>
+                    <div class="option-content">
+                        <div class="option-title" data-i18n="pin.yes.title">Закрепить</div>
+                        <div class="option-desc" data-i18n="pin.yes.desc">Будет в топе канала</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pin-options" id="pinDurationPicker" style="display: none;">
+                <div class="pin-btn" onclick="selectPinDuration(1)">
+                    <div class="pin-btn-label">1</div>
+                    <div class="pin-btn-desc" data-i18n="pin.day">день</div>
+                </div>
+                <div class="pin-btn" onclick="selectPinDuration(3)">
+                    <div class="pin-btn-label">3</div>
+                    <div class="pin-btn-desc" data-i18n="pin.days3">дня</div>
+                </div>
+                <div class="pin-btn" onclick="selectPinDuration(7)">
+                    <div class="pin-btn-label">7</div>
+                    <div class="pin-btn-desc" data-i18n="pin.days7">дней</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Ad Format -->
+        <div class="section" id="step5">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <div class="section-title">
+                    <h2 id="step5Title">Формат объявления</h2>
+                    <p id="step5Desc">Текст, фото или видео</p>
+                </div>
+                <div class="help-icon" onclick="showTooltip(event, 'format')">?</div>
+            </div>
+            <div class="option-grid">
+                <div class="option-btn" onclick="selectFormat('text')">
+                    <div class="option-icon">📝</div>
+                    <div class="option-content">
+                        <div class="option-title" data-i18n="format.text.title">Текст</div>
+                        <div class="option-desc" data-i18n="format.text.desc">Только текстовое объявление</div>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectFormat('image')">
+                    <div class="option-icon">🖼️</div>
+                    <div class="option-content">
+                        <div class="option-title" data-i18n="format.image.title">Изображение</div>
+                        <div class="option-desc" data-i18n="format.image.desc">Фото с подписью</div>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectFormat('video')">
+                    <div class="option-icon">🎬</div>
+                    <div class="option-content">
+                        <div class="option-title" data-i18n="format.video.title">Видео</div>
+                        <div class="option-desc" data-i18n="format.video.desc">Видеоролик с описанием</div>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectFormat('combined')">
+                    <div class="option-icon">📱</div>
+                    <div class="option-content">
+                        <div class="option-title" data-i18n="format.combined.title">Комбинированный</div>
+                        <div class="option-desc" data-i18n="format.combined.desc">Несколько медиафайлов</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: Duration -->
+        <div class="section" id="step6">
+            <div class="section-header">
+                <div class="section-number">6</div>
+                <div class="section-title">
+                    <h2 id="step6Title">Срок размещения</h2>
+                    <p id="step6Desc">Как долго будет видно объявление</p>
+                </div>
+                <div class="help-icon" onclick="showTooltip(event, 'duration')">?</div>
+            </div>
+            <div class="slider-container">
+                <div class="slider-value">
+                    <div class="slider-number" id="durationValue">30</div>
+                    <div class="slider-label" id="durationLabel">дней</div>
+                </div>
+                <input type="range" min="1" max="90" value="30" class="slider" id="durationSlider" oninput="updateDuration(this.value)">
+            </div>
+        </div>
+
+        <!-- Step 7: Summary & Payment -->
+        <div class="section" id="step7">
+            <div class="section-header">
+                <div class="section-number">7</div>
+                <div class="section-title">
+                    <h2 id="step7Title">Итого и оплата</h2>
+                    <p id="step7Desc">Проверьте заказ и выберите способ оплаты</p>
+                </div>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span class="summary-label" data-i18n="summary.tariff">Тариф:</span>
+                    <span class="summary-value" id="summaryTariff">—</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label" data-i18n="summary.placement">Тип размещения:</span>
+                    <span class="summary-value" id="summaryPlacement">—</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label" data-i18n="summary.time">Время:</span>
+                    <span class="summary-value" id="summaryTime">—</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label" data-i18n="summary.pin">Закрепление:</span>
+                    <span class="summary-value" id="summaryPin">—</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label" data-i18n="summary.format">Формат:</span>
+                    <span class="summary-value" id="summaryFormat">—</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label" data-i18n="summary.duration">Срок:</span>
+                    <span class="summary-value" id="summaryDuration">—</span>
+                </div>
+            </div>
+
+            <div class="summary-total">
+                <div class="summary-total-label" data-i18n="summary.total">К оплате:</div>
+                <div class="summary-total-price">
+                    <span id="totalPrice">0</span> <span id="totalCurrency">₽</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <div class="section-title" style="margin-bottom: 16px;">
+                    <h2 id="paymentMethodTitle">Способ оплаты</h2>
+                    <p id="paymentMethodDesc">Выберите удобный вариант</p>
+                </div>
+                <div class="payment-grid">
+                    <div class="payment-btn" onclick="selectPayment('stars')">
+                        <div class="payment-icon">⭐</div>
+                        <div class="payment-content">
+                            <div class="payment-name" data-i18n="payment.stars.name">Telegram Stars</div>
+                            <div class="payment-desc" data-i18n="payment.stars.desc">Быстрая оплата через Telegram</div>
+                        </div>
+                    </div>
+                    <div class="payment-btn" onclick="selectPayment('card')">
+                        <div class="payment-icon">💳</div>
+                        <div class="payment-content">
+                            <div class="payment-name" data-i18n="payment.card.name">Банковская карта</div>
+                            <div class="payment-desc" data-i18n="payment.card.desc">Visa, Mastercard, МИР</div>
+                        </div>
+                    </div>
+                    <div class="payment-btn" onclick="selectPayment('crypto')">
+                        <div class="payment-icon">₿</div>
+                        <div class="payment-content">
+                            <div class="payment-name" data-i18n="payment.crypto.name">Криптовалюта</div>
+                            <div class="payment-desc" data-i18n="payment.crypto.desc">BTC, ETH, USDT</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // Get language from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userLang = urlParams.get('lang') || 'ru';
+
+        // Translation data
+        const translations = {
+            ru: {
+                progressSteps: ['Тариф', 'Тип', 'Время', 'Закрепление', 'Формат', 'Срок', 'Оплата'],
+                tooltips: {
+                    tariff: 'Выберите подходящий тариф в зависимости от количества каналов и объявлений',
+                    placement: 'Разовое размещение - одна публикация. Подписка - регулярные публикации с заданной периодичностью',
+                    time: 'Опубликовать сразу или запланировать публикацию на удобное время',
+                    pin: 'Закрепленное объявление всегда находится в верхней части канала',
+                    format: 'Выберите формат: текст, изображение, видео или комбинированный вариант',
+                    duration: 'Срок, в течение которого объявление будет видно в канале'
+                },
+                days: 'дней',
+                day: 'день',
+                days3: 'дня',
+                days7: 'дней'
+            },
+            en: {
+                progressSteps: ['Plan', 'Type', 'Time', 'Pin', 'Format', 'Duration', 'Payment'],
+                tooltips: {
+                    tariff: 'Choose a suitable plan based on the number of channels and ads',
+                    placement: 'One-time placement - single publication. Subscription - regular publications',
+                    time: 'Post immediately or schedule for a convenient time',
+                    pin: 'Pinned ad always stays at the top of the channel',
+                    format: 'Choose format: text, image, video, or combined',
+                    duration: 'Duration for which the ad will be visible in the channel'
+                },
+                days: 'days',
+                day: 'day',
+                days3: 'days',
+                days7: 'days'
+            },
+            'zh-tw': {
+                progressSteps: ['方案', '類型', '時間', '置頂', '格式', '期限', '付款'],
+                tooltips: {
+                    tariff: '根據頻道和廣告數量選擇合適的方案',
+                    placement: '一次性投放 - 單次發布。訂閱 - 定期發布',
+                    time: '立即發布或安排方便的時間',
+                    pin: '置頂廣告始終位於頻道頂部',
+                    format: '選擇格式：文字、圖片、視頻或組合',
+                    duration: '廣告在頻道中可見的持續時間'
+                },
+                days: '天',
+                day: '天',
+                days3: '天',
+                days7: '天'
+            }
+        };
+
+        const t = translations[userLang] || translations.ru;
+
+        // State
+        let currentStep = 0;
+        let selectedData = {
+            tariff: null,
+            currency: 'RUB',
+            placementType: null,
+            publicationTime: null,
+            scheduledTime: null,
+            pinning: null,
+            pinDuration: null,
+            format: null,
+            duration: 30,
+            payment: null
+        };
+
+        // Tariff prices in different currencies
+        const tariffPrices = {
+            basic: { RUB: 500, USD: 6, CNY: 40 },
+            standard: { RUB: 1200, USD: 14, CNY: 95 },
+            premium: { RUB: 2500, USD: 30, CNY: 200 }
+        };
+
+        // Initialize
+        updateProgress();
+
+        function selectCurrency(currency) {
+            selectedData.currency = currency;
+            document.querySelectorAll('.currency-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.currency === currency);
+            });
+            updateTariffPrices();
+        }
+
+        function updateTariffPrices() {
+            const currency = selectedData.currency;
+            const symbols = { RUB: '₽', USD: '$', CNY: '¥' };
+            
+            ['basic', 'standard', 'premium'].forEach(tariff => {
+                document.getElementById(`${tariff}Price`).textContent = tariffPrices[tariff][currency];
+                document.getElementById(`${tariff}Currency`).textContent = symbols[currency];
+            });
+        }
+
+        function selectTariff(tariff) {
+            selectedData.tariff = tariff;
+            document.querySelectorAll('.tariff-card').forEach(card => card.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            setTimeout(() => goToStep(2), 400);
+        }
+
+        function selectPlacementType(type) {
+            selectedData.placementType = type;
+            document.querySelectorAll('#step2 .option-btn').forEach(btn => btn.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            setTimeout(() => goToStep(3), 400);
+        }
+
+        function selectPublicationTime(time) {
+            selectedData.publicationTime = time;
+            document.querySelectorAll('#step3 .option-btn').forEach(btn => btn.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            const timePicker = document.getElementById('timePicker');
+            if (time === 'scheduled') {
+                timePicker.classList.add('visible');
+            } else {
+                timePicker.classList.remove('visible');
+                setTimeout(() => goToStep(4), 400);
+            }
+        }
+
+        function setTime(hours, minutes) {
+            document.getElementById('hours').value = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').value = minutes.toString().padStart(2, '0');
+            selectedData.scheduledTime = `${hours}:${minutes}`;
+            setTimeout(() => goToStep(4), 400);
+        }
+
+        function selectPinning(pin) {
+            selectedData.pinning = pin;
+            document.querySelectorAll('#step4 .option-btn').forEach(btn => btn.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            const pinPicker = document.getElementById('pinDurationPicker');
+            if (pin === 'yes') {
+                pinPicker.style.display = 'grid';
+            } else {
+                pinPicker.style.display = 'none';
+                selectedData.pinDuration = null;
+                setTimeout(() => goToStep(5), 400);
+            }
+        }
+
+        function selectPinDuration(days) {
+            selectedData.pinDuration = days;
+            document.querySelectorAll('.pin-btn').forEach(btn => btn.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            setTimeout(() => goToStep(5), 400);
+        }
+
+        function selectFormat(format) {
+            selectedData.format = format;
+            document.querySelectorAll('#step5 .option-btn').forEach(btn => btn.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            setTimeout(() => goToStep(6), 400);
+        }
+
+        function updateDuration(value) {
+            selectedData.duration = parseInt(value);
+            document.getElementById('durationValue').textContent = value;
+            
+            // Update label
+            let label = t.days;
+            if (userLang === 'ru') {
+                if (value == 1) label = t.day;
+                else if (value >= 2 && value <= 4) label = t.days3;
+                else label = t.days7;
+            }
+            document.getElementById('durationLabel').textContent = label;
+            
+            // Auto-advance after selection
+            clearTimeout(window.durationTimer);
+            window.durationTimer = setTimeout(() => goToStep(7), 800);
+        }
+
+        function selectPayment(method) {
+            selectedData.payment = method;
+            document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+            
+            // Enable main button
+            tg.MainButton.setText(userLang === 'ru' ? 'Оплатить' : userLang === 'en' ? 'Pay' : '支付');
+            tg.MainButton.show();
+            tg.MainButton.enable();
+        }
+
+        function goToStep(stepNum) {
+            // Mark current as completed
+            if (currentStep > 0) {
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+                document.getElementById(`step${currentStep}`).classList.add('completed');
+            }
+            
+            // Activate new step
+            currentStep = stepNum;
+            const stepEl = document.getElementById(`step${stepNum}`);
+            stepEl.classList.remove('completed');
+            stepEl.classList.add('active');
+            
+            // Scroll to step
+            stepEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Update progress
+            updateProgress();
+            
+            // Update summary if at final step
+            if (stepNum === 7) {
+                updateSummary();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / 7) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('currentStep').textContent = currentStep;
+            if (currentStep > 0) {
+                document.getElementById('progressText').textContent = t.progressSteps[currentStep - 1];
+            }
+        }
+
+        function updateSummary() {
+            const symbols = { RUB: '₽', USD: '$', CNY: '¥' };
+            
+            // Tariff
+            const tariffNames = {
+                ru: { basic: 'Базовый', standard: 'Стандарт', premium: 'Премиум' },
+                en: { basic: 'Basic', standard: 'Standard', premium: 'Premium' },
+                'zh-tw': { basic: '基本', standard: '標準', premium: '高級' }
+            };
+            document.getElementById('summaryTariff').textContent = tariffNames[userLang][selectedData.tariff] || '—';
+            
+            // Placement
+            const placementNames = {
+                ru: { onetime: 'Разовое', subscription: 'Подписка' },
+                en: { onetime: 'One-time', subscription: 'Subscription' },
+                'zh-tw': { onetime: '一次性', subscription: '訂閱' }
+            };
+            document.getElementById('summaryPlacement').textContent = placementNames[userLang][selectedData.placementType] || '—';
+            
+            // Time
+            const timeNames = {
+                ru: { immediate: 'Сейчас', scheduled: 'Запланировано' },
+                en: { immediate: 'Immediate', scheduled: 'Scheduled' },
+                'zh-tw': { immediate: '立即', scheduled: '預定' }
+            };
+            let timeText = timeNames[userLang][selectedData.publicationTime] || '—';
+            if (selectedData.publicationTime === 'scheduled' && selectedData.scheduledTime) {
+                timeText += ` (${selectedData.scheduledTime})`;
+            }
+            document.getElementById('summaryTime').textContent = timeText;
+            
+            // Pin
+            const pinNames = {
+                ru: { no: 'Нет', yes: 'Да' },
+                en: { no: 'No', yes: 'Yes' },
+                'zh-tw': { no: '否', yes: '是' }
+            };
+            let pinText = pinNames[userLang][selectedData.pinning] || '—';
+            if (selectedData.pinning === 'yes' && selectedData.pinDuration) {
+                pinText += ` (${selectedData.pinDuration} ${selectedData.pinDuration === 1 ? t.day : t.days})`;
+            }
+            document.getElementById('summaryPin').textContent = pinText;
+            
+            // Format
+            const formatNames = {
+                ru: { text: 'Текст', image: 'Изображение', video: 'Видео', combined: 'Комбинированный' },
+                en: { text: 'Text', image: 'Image', video: 'Video', combined: 'Combined' },
+                'zh-tw': { text: '文字', image: '圖片', video: '視頻', combined: '組合' }
+            };
+            document.getElementById('summaryFormat').textContent = formatNames[userLang][selectedData.format] || '—';
+            
+            // Duration
+            document.getElementById('summaryDuration').textContent = `${selectedData.duration} ${selectedData.duration === 1 ? t.day : t.days}`;
+            
+            // Total price
+            const basePrice = tariffPrices[selectedData.tariff][selectedData.currency];
+            document.getElementById('totalPrice').textContent = basePrice;
+            document.getElementById('totalCurrency').textContent = symbols[selectedData.currency];
+        }
+
+        function showTooltip(event, type) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.textContent = t.tooltips[type];
+            tooltip.classList.add('show');
+            
+            const rect = event.target.getBoundingClientRect();
+            tooltip.style.top = (rect.top - tooltip.offsetHeight - 10) + 'px';
+            tooltip.style.left = (rect.left - tooltip.offsetWidth / 2 + rect.width / 2) + 'px';
+            
+            setTimeout(() => {
+                tooltip.classList.remove('show');
+            }, 3000);
+        }
+
+        // Hide tooltip on scroll
+        document.addEventListener('scroll', () => {
+            document.getElementById('tooltip').classList.remove('show');
+        });
+
+        // Main button handler
+        tg.MainButton.onClick(() => {
+            tg.sendData(JSON.stringify(selectedData));
+        });
+
+        // Initial state
+        tg.MainButton.hide();
+    </script>
+</body>
+</html>
