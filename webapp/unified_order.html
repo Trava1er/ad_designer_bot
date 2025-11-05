@@ -483,6 +483,7 @@
             background: var(--bg-secondary);
             outline: none;
             -webkit-appearance: none;
+            appearance: none;
         }
 
         .slider::-webkit-slider-thumb {
@@ -1119,11 +1120,20 @@
             payment: null
         };
 
-        // Tariff prices in different currencies
+        // Constants
+        const CURRENCY_SYMBOLS = { RUB: '₽', USD: '$', CNY: '¥' };
+        
+        // Tariff prices in different currencies (fallback if pricing_config fails)
         const tariffPrices = {
             basic: { RUB: 500, USD: 6, CNY: 40 },
             standard: { RUB: 1200, USD: 14, CNY: 95 },
             premium: { RUB: 2500, USD: 30, CNY: 200 }
+        };
+        
+        // Additional services prices (from pricing_config.json)
+        const servicePrices = {
+            pinning: { RUB: 300, USD: 4, CNY: 25 },
+            scheduling: { RUB: 200, USD: 2, CNY: 15 }
         };
 
         // Initialize
@@ -1135,15 +1145,15 @@
                 btn.classList.toggle('selected', btn.dataset.currency === currency);
             });
             updateTariffPrices();
+            updateServiceHints(); // Update hints with new currency
         }
 
         function updateTariffPrices() {
-            const currency = selectedData.currency;
-            const symbols = { RUB: '₽', USD: '$', CNY: '¥' };
+            const { currency } = selectedData;
             
             ['basic', 'standard', 'premium'].forEach(tariff => {
                 document.getElementById(`${tariff}Price`).textContent = tariffPrices[tariff][currency];
-                document.getElementById(`${tariff}Currency`).textContent = symbols[currency];
+                document.getElementById(`${tariff}Currency`).textContent = CURRENCY_SYMBOLS[currency];
             });
         }
 
@@ -1160,59 +1170,71 @@
 
         function updateServiceHints() {
             const tariff = selectedData.tariff;
+            const currency = selectedData.currency;
+            
+            // Get service prices for current currency
+            const pinPrice = servicePrices.pinning[currency];
+            const schedPrice = servicePrices.scheduling[currency];
+            const currSymbol = CURRENCY_SYMBOLS[currency];
             
             // Pinning hint
             const pinHint = document.getElementById('pinningHint');
             const pinPriceDesc = document.getElementById('pinPriceDesc');
             if (tariff === 'standard' || tariff === 'premium') {
-                if (userLang === 'ru') {
-                    pinHint.textContent = '✅ Входит в ваш тариф бесплатно';
-                    pinPriceDesc.textContent = 'Включено в тариф';
-                } else if (userLang === 'en') {
-                    pinHint.textContent = '✅ Included in your plan';
-                    pinPriceDesc.textContent = 'Included in plan';
-                } else {
-                    pinHint.textContent = '✅ 已包含在您的方案中';
-                    pinPriceDesc.textContent = '包含在方案中';
-                }
+                const messages = {
+                    'ru': { hint: '✅ Входит в ваш тариф бесплатно', desc: 'Включено в тариф' },
+                    'en': { hint: '✅ Included in your plan', desc: 'Included in plan' },
+                    'zh-tw': { hint: '✅ 已包含在您的方案中', desc: '包含在方案中' }
+                };
+                pinHint.textContent = messages[userLang].hint;
+                pinPriceDesc.textContent = messages[userLang].desc;
             } else {
-                if (userLang === 'ru') {
-                    pinHint.textContent = '💡 Бесплатно в: Стандарт, Премиум (300₽ отдельно)';
-                    pinPriceDesc.textContent = 'Будет в топе канала (+300₽)';
-                } else if (userLang === 'en') {
-                    pinHint.textContent = '💡 Free in: Standard, Premium ($4 separately)';
-                    pinPriceDesc.textContent = 'Will be at the top (+$4)';
-                } else {
-                    pinHint.textContent = '💡 免費於：標準, 高級 (¥25 單獨)';
-                    pinPriceDesc.textContent = '置於頂部 (+¥25)';
-                }
+                const messages = {
+                    'ru': { 
+                        hint: `💡 Бесплатно в: Стандарт, Премиум (${pinPrice}${currSymbol} отдельно)`,
+                        desc: `Будет в топе канала (+${pinPrice}${currSymbol})`
+                    },
+                    'en': { 
+                        hint: `💡 Free in: Standard, Premium (${currSymbol}${pinPrice} separately)`,
+                        desc: `Will be at the top (+${currSymbol}${pinPrice})`
+                    },
+                    'zh-tw': { 
+                        hint: `💡 免費於：標準, 高級 (${pinPrice}${currSymbol} 單獨)`,
+                        desc: `置於頂部 (+${pinPrice}${currSymbol})`
+                    }
+                };
+                pinHint.textContent = messages[userLang].hint;
+                pinPriceDesc.textContent = messages[userLang].desc;
             }
             
             // Scheduling hint
             const schedHint = document.getElementById('schedulingHint');
             const schedPriceDesc = document.getElementById('schedulePriceDesc');
             if (tariff === 'premium') {
-                if (userLang === 'ru') {
-                    schedHint.textContent = '✅ Входит в ваш тариф бесплатно';
-                    schedPriceDesc.textContent = 'Включено в тариф';
-                } else if (userLang === 'en') {
-                    schedHint.textContent = '✅ Included in your plan';
-                    schedPriceDesc.textContent = 'Included in plan';
-                } else {
-                    schedHint.textContent = '✅ 已包含在您的方案中';
-                    schedPriceDesc.textContent = '包含在方案中';
-                }
+                const messages = {
+                    'ru': { hint: '✅ Входит в ваш тариф бесплатно', desc: 'Включено в тариф' },
+                    'en': { hint: '✅ Included in your plan', desc: 'Included in plan' },
+                    'zh-tw': { hint: '✅ 已包含在您的方案中', desc: '包含在方案中' }
+                };
+                schedHint.textContent = messages[userLang].hint;
+                schedPriceDesc.textContent = messages[userLang].desc;
             } else {
-                if (userLang === 'ru') {
-                    schedHint.textContent = '💡 Бесплатно в: Премиум (200₽ отдельно)';
-                    schedPriceDesc.textContent = 'Выбрать дату и время (+200₽)';
-                } else if (userLang === 'en') {
-                    schedHint.textContent = '💡 Free in: Premium ($2 separately)';
-                    schedPriceDesc.textContent = 'Choose date and time (+$2)';
-                } else {
-                    schedHint.textContent = '💡 免費於：高級 (¥15 單獨)';
-                    schedPriceDesc.textContent = '選擇日期和時間 (+¥15)';
-                }
+                const messages = {
+                    'ru': { 
+                        hint: `💡 Бесплатно в: Премиум (${schedPrice}${currSymbol} отдельно)`,
+                        desc: `Выбрать дату и время (+${schedPrice}${currSymbol})`
+                    },
+                    'en': { 
+                        hint: `💡 Free in: Premium (${currSymbol}${schedPrice} separately)`,
+                        desc: `Choose date and time (+${currSymbol}${schedPrice})`
+                    },
+                    'zh-tw': { 
+                        hint: `💡 免費於：高級 (${schedPrice}${currSymbol} 單獨)`,
+                        desc: `選擇日期和時間 (+${schedPrice}${currSymbol})`
+                    }
+                };
+                schedHint.textContent = messages[userLang].hint;
+                schedPriceDesc.textContent = messages[userLang].desc;
             }
         }
 
@@ -1303,36 +1325,57 @@
         }
 
         function goToStep(stepNum) {
-            // Mark current as completed
-            if (currentStep > 0) {
-                document.getElementById(`step${currentStep}`).classList.remove('active');
-                document.getElementById(`step${currentStep}`).classList.add('completed');
-            }
-            
-            // Activate new step
-            currentStep = stepNum;
-            const stepEl = document.getElementById(`step${stepNum}`);
-            stepEl.classList.remove('completed');
-            stepEl.classList.add('active');
-            
-            // Scroll to step with offset for sticky progress bar
-            setTimeout(() => {
-                const progressBarHeight = document.querySelector('.progress-bar').offsetHeight;
-                const elementPosition = stepEl.getBoundingClientRect().top + window.scrollY;
-                const offsetPosition = elementPosition - progressBarHeight - 20; // 20px extra padding
+            try {
+                // Validate step number
+                if (stepNum < 1 || stepNum > 7) {
+                    console.error('Invalid step number:', stepNum);
+                    return;
+                }
                 
-                window.scrollTo({
-                    top: offsetPosition,
-                    behavior: 'smooth'
-                });
-            }, 100);
-            
-            // Update progress
-            updateProgress();
-            
-            // Update summary if at final step
-            if (stepNum === 7) {
-                updateSummary();
+                // Mark current as completed
+                if (currentStep > 0) {
+                    const currentStepEl = document.getElementById(`step${currentStep}`);
+                    if (currentStepEl) {
+                        currentStepEl.classList.remove('active');
+                        currentStepEl.classList.add('completed');
+                    }
+                }
+                
+                // Activate new step
+                currentStep = stepNum;
+                const stepEl = document.getElementById(`step${stepNum}`);
+                if (!stepEl) {
+                    console.error('Step element not found:', stepNum);
+                    return;
+                }
+                
+                stepEl.classList.remove('completed');
+                stepEl.classList.add('active');
+                
+                // Scroll to step with offset for sticky progress bar
+                setTimeout(() => {
+                    const progressBar = document.querySelector('.progress-bar');
+                    if (!progressBar) return;
+                    
+                    const progressBarHeight = progressBar.offsetHeight;
+                    const elementPosition = stepEl.getBoundingClientRect().top + window.scrollY;
+                    const offsetPosition = elementPosition - progressBarHeight - 20; // 20px extra padding
+                    
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }, 100);
+                
+                // Update progress
+                updateProgress();
+                
+                // Update summary if at final step
+                if (stepNum === 7) {
+                    updateSummary();
+                }
+            } catch (error) {
+                console.error('Error in goToStep:', error);
             }
         }
 
@@ -1346,8 +1389,6 @@
         }
 
         function updateSummary() {
-            const symbols = { RUB: '₽', USD: '$', CNY: '¥' };
-            
             // Tariff
             const tariffNames = {
                 ru: { basic: 'Базовый', standard: 'Стандарт', premium: 'Премиум' },
@@ -1400,9 +1441,9 @@
             document.getElementById('summaryDuration').textContent = `${selectedData.duration} ${selectedData.duration === 1 ? t.day : t.days}`;
             
             // Total price
-            const basePrice = tariffPrices[selectedData.tariff][selectedData.currency];
+            const basePrice = tariffPrices[selectedData.tariff]?.[selectedData.currency] || 0;
             document.getElementById('totalPrice').textContent = basePrice;
-            document.getElementById('totalCurrency').textContent = symbols[selectedData.currency];
+            document.getElementById('totalCurrency').textContent = CURRENCY_SYMBOLS[selectedData.currency];
         }
 
         function showTooltip(event, type) {
