@@ -269,22 +269,28 @@
 
         .tariff-features {
             list-style: none;
+            margin-top: 12px;
         }
 
         .tariff-features li {
-            padding: 8px 0;
-            font-size: 14px;
+            padding: 6px 0;
+            font-size: 13px;
             color: var(--text-secondary);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .tariff-features li::before {
-            content: '✓';
-            color: var(--accent-green);
-            font-weight: 700;
-            font-size: 16px;
+            content: '';
+            display: none;
+        }
+
+        .tariff-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-style: italic;
         }
 
         /* Option Buttons */
@@ -723,11 +729,7 @@
                     <div class="tariff-price">
                         <span id="basicPrice">500</span> <small id="basicCurrency">₽</small>
                     </div>
-                    <ul class="tariff-features">
-                        <li data-i18n="tariff.basic.feat1">1 канал размещения</li>
-                        <li data-i18n="tariff.basic.feat2">Публикация 1 объявления</li>
-                        <li data-i18n="tariff.basic.feat3">Статистика просмотров</li>
-                    </ul>
+                    <div class="tariff-desc" id="basicDesc">Для тестирования платформы</div>
                 </div>
 
                 <div class="tariff-card" onclick="selectTariff('standard')">
@@ -736,11 +738,9 @@
                     <div class="tariff-price">
                         <span id="standardPrice">1200</span> <small id="standardCurrency">₽</small>
                     </div>
+                    <div class="tariff-desc" id="standardDesc">Оптимальный выбор</div>
                     <ul class="tariff-features">
-                        <li data-i18n="tariff.standard.feat1">3 канала размещения</li>
-                        <li data-i18n="tariff.standard.feat2">Публикация 3 объявлений</li>
-                        <li data-i18n="tariff.standard.feat3">Приоритетная поддержка</li>
-                        <li data-i18n="tariff.standard.feat4">Детальная аналитика</li>
+                        <li>📍 Закрепление <span style="color: var(--accent-green)">включено</span></li>
                     </ul>
                 </div>
 
@@ -750,12 +750,10 @@
                     <div class="tariff-price">
                         <span id="premiumPrice">2500</span> <small id="premiumCurrency">₽</small>
                     </div>
+                    <div class="tariff-desc" id="premiumDesc">Максимум возможностей</div>
                     <ul class="tariff-features">
-                        <li data-i18n="tariff.premium.feat1">10 каналов размещения</li>
-                        <li data-i18n="tariff.premium.feat2">Безлимит объявлений</li>
-                        <li data-i18n="tariff.premium.feat3">VIP поддержка 24/7</li>
-                        <li data-i18n="tariff.premium.feat4">Расширенная аналитика</li>
-                        <li data-i18n="tariff.premium.feat5">Автопродвижение</li>
+                        <li>📍 Закрепление <span style="color: var(--accent-green)">включено</span></li>
+                        <li>⏰ Отложенная публикация <span style="color: var(--accent-green)">включено</span></li>
                     </ul>
                 </div>
             </div>
@@ -796,6 +794,7 @@
                 <div class="section-title">
                     <h2 id="step3Title">Время публикации</h2>
                     <p id="step3Desc">Сейчас или запланировать</p>
+                    <p id="schedulingHint" style="font-size: 12px; color: var(--accent-green); margin-top: 4px;"></p>
                 </div>
                 <div class="help-icon" onclick="showTooltip(event, 'time')">?</div>
             </div>
@@ -811,7 +810,7 @@
                     <div class="option-icon">⏰</div>
                     <div class="option-content">
                         <div class="option-title" data-i18n="time.scheduled.title">Запланировать</div>
-                        <div class="option-desc" data-i18n="time.scheduled.desc">Выбрать дату и время</div>
+                        <div class="option-desc" data-i18n="time.scheduled.desc" id="schedulePriceDesc">Выбрать дату и время</div>
                     </div>
                 </div>
             </div>
@@ -839,6 +838,7 @@
                 <div class="section-title">
                     <h2 id="step4Title">Закрепление</h2>
                     <p id="step4Desc">Сделать объявление заметнее</p>
+                    <p id="pinningHint" style="font-size: 12px; color: var(--accent-green); margin-top: 4px;"></p>
                 </div>
                 <div class="help-icon" onclick="showTooltip(event, 'pin')">?</div>
             </div>
@@ -854,7 +854,7 @@
                     <div class="option-icon">📍</div>
                     <div class="option-content">
                         <div class="option-title" data-i18n="pin.yes.title">Закрепить</div>
-                        <div class="option-desc" data-i18n="pin.yes.desc">Будет в топе канала</div>
+                        <div class="option-desc" data-i18n="pin.yes.desc" id="pinPriceDesc">Будет в топе канала</div>
                     </div>
                 </div>
             </div>
@@ -1151,7 +1151,69 @@
             selectedData.tariff = tariff;
             document.querySelectorAll('.tariff-card').forEach(card => card.classList.remove('selected'));
             event.currentTarget.classList.add('selected');
+            
+            // Update hints about included services
+            updateServiceHints();
+            
             setTimeout(() => goToStep(2), 400);
+        }
+
+        function updateServiceHints() {
+            const tariff = selectedData.tariff;
+            
+            // Pinning hint
+            const pinHint = document.getElementById('pinningHint');
+            const pinPriceDesc = document.getElementById('pinPriceDesc');
+            if (tariff === 'standard' || tariff === 'premium') {
+                if (userLang === 'ru') {
+                    pinHint.textContent = '✅ Входит в ваш тариф бесплатно';
+                    pinPriceDesc.textContent = 'Включено в тариф';
+                } else if (userLang === 'en') {
+                    pinHint.textContent = '✅ Included in your plan';
+                    pinPriceDesc.textContent = 'Included in plan';
+                } else {
+                    pinHint.textContent = '✅ 已包含在您的方案中';
+                    pinPriceDesc.textContent = '包含在方案中';
+                }
+            } else {
+                if (userLang === 'ru') {
+                    pinHint.textContent = '💡 Бесплатно в: Стандарт, Премиум (300₽ отдельно)';
+                    pinPriceDesc.textContent = 'Будет в топе канала (+300₽)';
+                } else if (userLang === 'en') {
+                    pinHint.textContent = '💡 Free in: Standard, Premium ($4 separately)';
+                    pinPriceDesc.textContent = 'Will be at the top (+$4)';
+                } else {
+                    pinHint.textContent = '💡 免費於：標準, 高級 (¥25 單獨)';
+                    pinPriceDesc.textContent = '置於頂部 (+¥25)';
+                }
+            }
+            
+            // Scheduling hint
+            const schedHint = document.getElementById('schedulingHint');
+            const schedPriceDesc = document.getElementById('schedulePriceDesc');
+            if (tariff === 'premium') {
+                if (userLang === 'ru') {
+                    schedHint.textContent = '✅ Входит в ваш тариф бесплатно';
+                    schedPriceDesc.textContent = 'Включено в тариф';
+                } else if (userLang === 'en') {
+                    schedHint.textContent = '✅ Included in your plan';
+                    schedPriceDesc.textContent = 'Included in plan';
+                } else {
+                    schedHint.textContent = '✅ 已包含在您的方案中';
+                    schedPriceDesc.textContent = '包含在方案中';
+                }
+            } else {
+                if (userLang === 'ru') {
+                    schedHint.textContent = '💡 Бесплатно в: Премиум (200₽ отдельно)';
+                    schedPriceDesc.textContent = 'Выбрать дату и время (+200₽)';
+                } else if (userLang === 'en') {
+                    schedHint.textContent = '💡 Free in: Premium ($2 separately)';
+                    schedPriceDesc.textContent = 'Choose date and time (+$2)';
+                } else {
+                    schedHint.textContent = '💡 免費於：高級 (¥15 單獨)';
+                    schedPriceDesc.textContent = '選擇日期和時間 (+¥15)';
+                }
+            }
         }
 
         function selectPlacementType(type) {
