@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Настройка размещения</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1d29;
+            --bg-secondary: #242938;
+            --bg-card: #2d3142;
+            --text-primary: #e8eaed;
+            --text-secondary: #9ca3af;
+            --accent-blue: #4a90e2;
+            --accent-green: #52c41a;
+            --accent-gold: #faad14;
+            --accent-purple: #9254de;
+            --border-color: #3d4153;
+            --hover-bg: #353849;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px 16px 120px;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: sticky;
+            top: 0;
+            background: var(--bg-primary);
+            padding: 12px 16px;
+            margin: -20px -16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .progress-count {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        .progress-track {
+            height: 4px;
+            background: var(--bg-secondary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-green) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Criteria Section */
+        .criteria-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            scroll-margin-top: 80px;
+        }
+
+        .criteria-section.completed {
+            border-color: var(--accent-green);
+            background: linear-gradient(135deg, rgba(82, 196, 26, 0.05) 0%, rgba(74, 144, 226, 0.05) 100%);
+        }
+
+        .criteria-section.active {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
+        }
+
+        .criteria-header {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .criteria-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .criteria-section.completed .criteria-number {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: white;
+        }
+
+        .criteria-section.active .criteria-number {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .criteria-title-wrapper {
+            flex: 1;
+        }
+
+        .criteria-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .criteria-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Help Button */
+        .help-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .help-btn:hover {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        /* Help Tooltip */
+        .help-tooltip {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            display: none;
+        }
+
+        .help-tooltip.show {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .options-grid.single-column {
+            grid-template-columns: 1fr;
+        }
+
+        .option-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card:hover {
+            background: var(--hover-bg);
+            border-color: var(--accent-blue);
+        }
+
+        .option-card.selected {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.15) 0%, rgba(82, 196, 26, 0.1) 100%);
+            border-color: var(--accent-blue);
+        }
+
+        .option-card.selected::before {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .option-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .option-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .option-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Time Picker */
+        .time-picker {
+            margin-top: 16px;
+            display: none;
+        }
+
+        .time-picker.show {
+            display: block;
+        }
+
+        .time-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .time-input-wrapper {
+            position: relative;
+        }
+
+        .time-input-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .time-input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .time-input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        /* Suggested Times */
+        .suggested-times {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .time-chip {
+            padding: 6px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .time-chip:hover {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+        }
+
+        /* Duration Slider */
+        .duration-slider {
+            margin-top: 16px;
+        }
+
+        .slider-wrapper {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--bg-secondary);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            border: 3px solid var(--bg-primary);
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.4);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            border: 3px solid var(--bg-primary);
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.4);
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-top: 12px;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, var(--bg-primary) 80%, transparent);
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+            z-index: 99;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-green) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--accent-gold);
+            display: none;
+        }
+
+        .summary-section.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .summary-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .summary-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent-blue);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px 12px 100px;
+            }
+
+            .criteria-section {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scroll Behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+        <div class="progress-container">
+            <span class="progress-text" id="progressText">Заполнение критериев</span>
+            <span class="progress-count" id="progressCount">0/5</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 id="pageTitle">⚙️ Настройка размещения</h1>
+            <p id="pageSubtitle">Настройте параметры публикации вашего объявления</p>
+        </div>
+
+        <!-- Criterion 1: Placement Type -->
+        <div class="criteria-section active" id="criterion1" data-criterion="placementType">
+            <div class="criteria-header">
+                <div class="criteria-number">1</div>
+                <div class="criteria-title-wrapper">
+                    <div class="criteria-title">
+                        <span id="criterion1Title">Тип размещения</span>
+                        <span class="help-btn" onclick="toggleHelp('help1')">?</span>
+                    </div>
+                    <div class="criteria-description" id="criterion1Desc">Выберите разовую публикацию или подписку</div>
+                </div>
+            </div>
+            <div class="help-tooltip" id="help1">
+                <strong>ℹ️ Справка:</strong><br>
+                • <strong>Разовое</strong> — одна публикация вашего объявления<br>
+                • <strong>Подписка</strong> — регулярные автоматические публикации по расписанию для постоянной видимости
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="selectOption('placementType', 'onetime', this)">
+                    <span class="option-icon">📝</span>
+                    <div class="option-title" id="placementOneTime">Разовое</div>
+                    <div class="option-subtitle" id="placementOneTimeDesc">Одна публикация</div>
+                </div>
+                <div class="option-card" onclick="selectOption('placementType', 'subscription', this)">
+                    <span class="option-icon">🔄</span>
+                    <div class="option-title" id="placementSubscription">Подписка</div>
+                    <div class="option-subtitle" id="placementSubscriptionDesc">Регулярные публикации</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Criterion 2: Publication Time -->
+        <div class="criteria-section" id="criterion2" data-criterion="publicationTime">
+            <div class="criteria-header">
+                <div class="criteria-number">2</div>
+                <div class="criteria-title-wrapper">
+                    <div class="criteria-title">
+                        <span id="criterion2Title">Время публикации</span>
+                        <span class="help-btn" onclick="toggleHelp('help2')">?</span>
+                    </div>
+                    <div class="criteria-description" id="criterion2Desc">Когда опубликовать объявление</div>
+                </div>
+            </div>
+            <div class="help-tooltip" id="help2">
+                <strong>ℹ️ Справка:</strong><br>
+                • <strong>Немедленно</strong> — публикация сразу после оплаты<br>
+                • <strong>По расписанию</strong> — выберите оптимальное время для максимального охвата аудитории. Рекомендуем: 9:00, 13:00, 18:00 — пики активности пользователей
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="selectOption('publicationTime', 'immediate', this)">
+                    <span class="option-icon">⚡</span>
+                    <div class="option-title" id="pubTimeImmediate">Немедленно</div>
+                    <div class="option-subtitle" id="pubTimeImmediateDesc">Сразу после оплаты</div>
+                </div>
+                <div class="option-card" onclick="selectOption('publicationTime', 'scheduled', this)">
+                    <span class="option-icon">📅</span>
+                    <div class="option-title" id="pubTimeScheduled">По расписанию</div>
+                    <div class="option-subtitle" id="pubTimeScheduledDesc">Выбрать время</div>
+                </div>
+            </div>
+            <div class="time-picker" id="timePicker">
+                <div class="time-input-group">
+                    <div class="time-input-wrapper">
+                        <label class="time-input-label" id="labelDate">Дата</label>
+                        <input type="date" class="time-input" id="scheduleDate">
+                    </div>
+                    <div class="time-input-wrapper">
+                        <label class="time-input-label" id="labelTime">Время</label>
+                        <input type="time" class="time-input" id="scheduleTime">
+                    </div>
+                </div>
+                <div class="time-input-label" id="labelSuggested">⭐ Рекомендуемое время (пики активности):</div>
+                <div class="suggested-times">
+                    <span class="time-chip" onclick="setSuggestedTime('09:00')">🌅 9:00</span>
+                    <span class="time-chip" onclick="setSuggestedTime('13:00')">☀️ 13:00</span>
+                    <span class="time-chip" onclick="setSuggestedTime('18:00')">🌆 18:00</span>
+                    <span class="time-chip" onclick="setSuggestedTime('21:00')">🌙 21:00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Criterion 3: Pinning -->
+        <div class="criteria-section" id="criterion3" data-criterion="pinning">
+            <div class="criteria-header">
+                <div class="criteria-number">3</div>
+                <div class="criteria-title-wrapper">
+                    <div class="criteria-title">
+                        <span id="criterion3Title">Закрепление</span>
+                        <span class="help-btn" onclick="toggleHelp('help3')">?</span>
+                    </div>
+                    <div class="criteria-description" id="criterion3Desc">Зафиксировать объявление вверху канала</div>
+                </div>
+            </div>
+            <div class="help-tooltip" id="help3">
+                <strong>ℹ️ Справка:</strong><br>
+                • <strong>Без закрепления</strong> — объявление в общей ленте<br>
+                • <strong>Закрепить</strong> — пост будет в топе канала для максимальной видимости. Выберите срок: от 1 дня до недели
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="selectOption('pinning', 'no', this)">
+                    <span class="option-icon">📄</span>
+                    <div class="option-title" id="pinNo">Без закрепления</div>
+                    <div class="option-subtitle" id="pinNoDesc">В общей ленте</div>
+                </div>
+                <div class="option-card" onclick="selectOption('pinning', 'yes', this)">
+                    <span class="option-icon">📌</span>
+                    <div class="option-title" id="pinYes">Закрепить</div>
+                    <div class="option-subtitle" id="pinYesDesc">В топе канала</div>
+                </div>
+            </div>
+            <div class="time-picker" id="pinDurationPicker">
+                <div class="time-input-label" id="labelPinDuration">Срок закрепления:</div>
+                <div class="suggested-times">
+                    <span class="time-chip" onclick="setPinDuration('1')">1 день</span>
+                    <span class="time-chip" onclick="setPinDuration('3')">3 дня</span>
+                    <span class="time-chip" onclick="setPinDuration('7')">7 дней</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Criterion 4: Ad Format -->
+        <div class="criteria-section" id="criterion4" data-criterion="adFormat">
+            <div class="criteria-header">
+                <div class="criteria-number">4</div>
+                <div class="criteria-title-wrapper">
+                    <div class="criteria-title">
+                        <span id="criterion4Title">Формат объявления</span>
+                        <span class="help-btn" onclick="toggleHelp('help4')">?</span>
+                    </div>
+                    <div class="criteria-description" id="criterion4Desc">Выберите формат медиа-контента</div>
+                </div>
+            </div>
+            <div class="help-tooltip" id="help4">
+                <strong>ℹ️ Справка:</strong><br>
+                • <strong>Текст</strong> — только текстовое объявление<br>
+                • <strong>Изображение</strong> — текст + одно изображение (рекомендуется)<br>
+                • <strong>Видео</strong> — текст + видео для максимального вовлечения<br>
+                • <strong>Комбинированный</strong> — несколько фото или микс медиа
+            </div>
+            <div class="options-grid">
+                <div class="option-card" onclick="selectOption('adFormat', 'text', this)">
+                    <span class="option-icon">📝</span>
+                    <div class="option-title" id="formatText">Текст</div>
+                    <div class="option-subtitle" id="formatTextDesc">Только текст</div>
+                </div>
+                <div class="option-card" onclick="selectOption('adFormat', 'image', this)">
+                    <span class="option-icon">🖼️</span>
+                    <div class="option-title" id="formatImage">Изображение</div>
+                    <div class="option-subtitle" id="formatImageDesc">Текст + фото</div>
+                </div>
+                <div class="option-card" onclick="selectOption('adFormat', 'video', this)">
+                    <span class="option-icon">🎬</span>
+                    <div class="option-title" id="formatVideo">Видео</div>
+                    <div class="option-subtitle" id="formatVideoDesc">Текст + видео</div>
+                </div>
+                <div class="option-card" onclick="selectOption('adFormat', 'combined', this)">
+                    <span class="option-icon">🎨</span>
+                    <div class="option-title" id="formatCombined">Комбинированный</div>
+                    <div class="option-subtitle" id="formatCombinedDesc">Несколько медиа</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Criterion 5: Visibility Duration -->
+        <div class="criteria-section" id="criterion5" data-criterion="visibilityDuration">
+            <div class="criteria-header">
+                <div class="criteria-number">5</div>
+                <div class="criteria-title-wrapper">
+                    <div class="criteria-title">
+                        <span id="criterion5Title">Длительность видимости</span>
+                        <span class="help-btn" onclick="toggleHelp('help5')">?</span>
+                    </div>
+                    <div class="criteria-description" id="criterion5Desc">Сколько дней объявление будет активным</div>
+                </div>
+            </div>
+            <div class="help-tooltip" id="help5">
+                <strong>ℹ️ Справка:</strong><br>
+                Объявление будет видно в канале указанное количество дней. После этого оно будет автоматически удалено или архивировано.<br>
+                • <strong>3-7 дней</strong> — для срочных предложений<br>
+                • <strong>14-30 дней</strong> — для долгосрочных объявлений
+            </div>
+            <div class="duration-slider">
+                <input type="range" min="1" max="90" value="7" class="slider" id="durationSlider" oninput="updateDuration(this.value)">
+                <div class="slider-value">
+                    <span id="durationValue">7</span> <span id="durationLabel">дней</span>
+                </div>
+                <div class="slider-labels">
+                    <span>1 день</span>
+                    <span>90 дней</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary-section" id="summarySection">
+            <div class="summary-title">
+                <span>📋</span>
+                <span id="summaryTitle">Итоговые параметры</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label" id="summaryLabel1">Тип размещения:</span>
+                <span class="summary-value" id="summaryValue1">-</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label" id="summaryLabel2">Время публикации:</span>
+                <span class="summary-value" id="summaryValue2">-</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label" id="summaryLabel3">Закрепление:</span>
+                <span class="summary-value" id="summaryValue3">-</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label" id="summaryLabel4">Формат:</span>
+                <span class="summary-value" id="summaryValue4">-</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label" id="summaryLabel5">Длительность:</span>
+                <span class="summary-value" id="summaryValue5">-</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <button class="btn btn-primary" id="submitBtn" onclick="submitCriteria()" disabled>
+            <span id="btnText">Выберите все критерии</span>
+            <span>→</span>
+        </button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // Selection state
+        const selections = {
+            placementType: null,
+            publicationTime: null,
+            scheduleDate: null,
+            scheduleTime: null,
+            pinning: null,
+            pinDuration: null,
+            adFormat: null,
+            visibilityDuration: 7
+        };
+
+        // Language detection
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        
+        let userLang = 'ru';
+        
+        if (urlLang) {
+            userLang = urlLang;
+        } else if (tg.initDataUnsafe?.user?.language_code) {
+            userLang = tg.initDataUnsafe.user.language_code;
+        } else if (navigator.language) {
+            userLang = navigator.language;
+        }
+        
+        let lang = userLang.toLowerCase();
+        
+        if (lang.startsWith('zh')) {
+            lang = 'zh';
+        } else {
+            lang = lang.substring(0, 2);
+        }
+        
+        if (!['ru', 'en', 'zh'].includes(lang)) {
+            lang = 'ru';
+        }
+
+        // Translations
+        const translations = {
+            ru: {
+                pageTitle: '⚙️ Настройка размещения',
+                pageSubtitle: 'Настройте параметры публикации вашего объявления',
+                progressText: 'Заполнение критериев',
+                criterion1Title: 'Тип размещения',
+                criterion1Desc: 'Выберите разовую публикацию или подписку',
+                criterion2Title: 'Время публикации',
+                criterion2Desc: 'Когда опубликовать объявление',
+                criterion3Title: 'Закрепление',
+                criterion3Desc: 'Зафиксировать объявление вверху канала',
+                criterion4Title: 'Формат объявления',
+                criterion4Desc: 'Выберите формат медиа-контента',
+                criterion5Title: 'Длительность видимости',
+                criterion5Desc: 'Сколько дней объявление будет активным',
+                placementOneTime: 'Разовое',
+                placementOneTimeDesc: 'Одна публикация',
+                placementSubscription: 'Подписка',
+                placementSubscriptionDesc: 'Регулярные публикации',
+                pubTimeImmediate: 'Немедленно',
+                pubTimeImmediateDesc: 'Сразу после оплаты',
+                pubTimeScheduled: 'По расписанию',
+                pubTimeScheduledDesc: 'Выбрать время',
+                pinNo: 'Без закрепления',
+                pinNoDesc: 'В общей ленте',
+                pinYes: 'Закрепить',
+                pinYesDesc: 'В топе канала',
+                formatText: 'Текст',
+                formatTextDesc: 'Только текст',
+                formatImage: 'Изображение',
+                formatImageDesc: 'Текст + фото',
+                formatVideo: 'Видео',
+                formatVideoDesc: 'Текст + видео',
+                formatCombined: 'Комбинированный',
+                formatCombinedDesc: 'Несколько медиа',
+                summaryTitle: 'Итоговые параметры',
+                summaryLabel1: 'Тип размещения:',
+                summaryLabel2: 'Время публикации:',
+                summaryLabel3: 'Закрепление:',
+                summaryLabel4: 'Формат:',
+                summaryLabel5: 'Длительность:',
+                btnTextIncomplete: 'Выберите все критерии',
+                btnTextComplete: 'Продолжить к выбору тарифа',
+                labelDate: 'Дата',
+                labelTime: 'Время',
+                labelSuggested: '⭐ Рекомендуемое время (пики активности):',
+                labelPinDuration: 'Срок закрепления:',
+                durationLabel: 'дней'
+            },
+            en: {
+                pageTitle: '⚙️ Placement Settings',
+                pageSubtitle: 'Configure your ad publication parameters',
+                progressText: 'Completing criteria',
+                criterion1Title: 'Placement Type',
+                criterion1Desc: 'Choose one-time or subscription',
+                criterion2Title: 'Publication Time',
+                criterion2Desc: 'When to publish the ad',
+                criterion3Title: 'Pinning',
+                criterion3Desc: 'Pin ad at the top of the channel',
+                criterion4Title: 'Ad Format',
+                criterion4Desc: 'Choose media content format',
+                criterion5Title: 'Visibility Duration',
+                criterion5Desc: 'How many days the ad will be active',
+                placementOneTime: 'One-time',
+                placementOneTimeDesc: 'Single publication',
+                placementSubscription: 'Subscription',
+                placementSubscriptionDesc: 'Regular publications',
+                pubTimeImmediate: 'Immediately',
+                pubTimeImmediateDesc: 'Right after payment',
+                pubTimeScheduled: 'Scheduled',
+                pubTimeScheduledDesc: 'Choose time',
+                pinNo: 'No pinning',
+                pinNoDesc: 'In general feed',
+                pinYes: 'Pin',
+                pinYesDesc: 'At channel top',
+                formatText: 'Text',
+                formatTextDesc: 'Text only',
+                formatImage: 'Image',
+                formatImageDesc: 'Text + photo',
+                formatVideo: 'Video',
+                formatVideoDesc: 'Text + video',
+                formatCombined: 'Combined',
+                formatCombinedDesc: 'Multiple media',
+                summaryTitle: 'Final Parameters',
+                summaryLabel1: 'Placement type:',
+                summaryLabel2: 'Publication time:',
+                summaryLabel3: 'Pinning:',
+                summaryLabel4: 'Format:',
+                summaryLabel5: 'Duration:',
+                btnTextIncomplete: 'Select all criteria',
+                btnTextComplete: 'Continue to tariff selection',
+                labelDate: 'Date',
+                labelTime: 'Time',
+                labelSuggested: '⭐ Suggested time (peak activity):',
+                labelPinDuration: 'Pin duration:',
+                durationLabel: 'days'
+            },
+            zh: {
+                pageTitle: '⚙️ 發布設置',
+                pageSubtitle: '配置您的廣告發布參數',
+                progressText: '填寫標準',
+                criterion1Title: '發布類型',
+                criterion1Desc: '選擇一次性或訂閱',
+                criterion2Title: '發布時間',
+                criterion2Desc: '何時發布廣告',
+                criterion3Title: '置頂',
+                criterion3Desc: '將廣告置頂於頻道頂部',
+                criterion4Title: '廣告格式',
+                criterion4Desc: '選擇媒體內容格式',
+                criterion5Title: '可見時長',
+                criterion5Desc: '廣告保持活躍的天數',
+                placementOneTime: '一次性',
+                placementOneTimeDesc: '單次發布',
+                placementSubscription: '訂閱',
+                placementSubscriptionDesc: '定期發布',
+                pubTimeImmediate: '立即',
+                pubTimeImmediateDesc: '付款後立即',
+                pubTimeScheduled: '預定',
+                pubTimeScheduledDesc: '選擇時間',
+                pinNo: '不置頂',
+                pinNoDesc: '在普通訊息流中',
+                pinYes: '置頂',
+                pinYesDesc: '在頻道頂部',
+                formatText: '文字',
+                formatTextDesc: '僅文字',
+                formatImage: '圖片',
+                formatImageDesc: '文字+圖片',
+                formatVideo: '視頻',
+                formatVideoDesc: '文字+視頻',
+                formatCombined: '組合',
+                formatCombinedDesc: '多個媒體',
+                summaryTitle: '最終參數',
+                summaryLabel1: '發布類型：',
+                summaryLabel2: '發布時間：',
+                summaryLabel3: '置頂：',
+                summaryLabel4: '格式：',
+                summaryLabel5: '時長：',
+                btnTextIncomplete: '選擇所有標準',
+                btnTextComplete: '繼續選擇方案',
+                labelDate: '日期',
+                labelTime: '時間',
+                labelSuggested: '⭐ 建議時間（高峰期）：',
+                labelPinDuration: '置頂期限：',
+                durationLabel: '天'
+            }
+        };
+
+        // Apply translations
+        function applyTranslations() {
+            const t = translations[lang];
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('pageSubtitle').textContent = t.pageSubtitle;
+            document.getElementById('progressText').textContent = t.progressText;
+            
+            // Criteria titles
+            document.getElementById('criterion1Title').textContent = t.criterion1Title;
+            document.getElementById('criterion1Desc').textContent = t.criterion1Desc;
+            document.getElementById('criterion2Title').textContent = t.criterion2Title;
+            document.getElementById('criterion2Desc').textContent = t.criterion2Desc;
+            document.getElementById('criterion3Title').textContent = t.criterion3Title;
+            document.getElementById('criterion3Desc').textContent = t.criterion3Desc;
+            document.getElementById('criterion4Title').textContent = t.criterion4Title;
+            document.getElementById('criterion4Desc').textContent = t.criterion4Desc;
+            document.getElementById('criterion5Title').textContent = t.criterion5Title;
+            document.getElementById('criterion5Desc').textContent = t.criterion5Desc;
+            
+            // Options
+            document.getElementById('placementOneTime').textContent = t.placementOneTime;
+            document.getElementById('placementOneTimeDesc').textContent = t.placementOneTimeDesc;
+            document.getElementById('placementSubscription').textContent = t.placementSubscription;
+            document.getElementById('placementSubscriptionDesc').textContent = t.placementSubscriptionDesc;
+            document.getElementById('pubTimeImmediate').textContent = t.pubTimeImmediate;
+            document.getElementById('pubTimeImmediateDesc').textContent = t.pubTimeImmediateDesc;
+            document.getElementById('pubTimeScheduled').textContent = t.pubTimeScheduled;
+            document.getElementById('pubTimeScheduledDesc').textContent = t.pubTimeScheduledDesc;
+            document.getElementById('pinNo').textContent = t.pinNo;
+            document.getElementById('pinNoDesc').textContent = t.pinNoDesc;
+            document.getElementById('pinYes').textContent = t.pinYes;
+            document.getElementById('pinYesDesc').textContent = t.pinYesDesc;
+            document.getElementById('formatText').textContent = t.formatText;
+            document.getElementById('formatTextDesc').textContent = t.formatTextDesc;
+            document.getElementById('formatImage').textContent = t.formatImage;
+            document.getElementById('formatImageDesc').textContent = t.formatImageDesc;
+            document.getElementById('formatVideo').textContent = t.formatVideo;
+            document.getElementById('formatVideoDesc').textContent = t.formatVideoDesc;
+            document.getElementById('formatCombined').textContent = t.formatCombined;
+            document.getElementById('formatCombinedDesc').textContent = t.formatCombinedDesc;
+            
+            // Summary
+            document.getElementById('summaryTitle').textContent = t.summaryTitle;
+            document.getElementById('summaryLabel1').textContent = t.summaryLabel1;
+            document.getElementById('summaryLabel2').textContent = t.summaryLabel2;
+            document.getElementById('summaryLabel3').textContent = t.summaryLabel3;
+            document.getElementById('summaryLabel4').textContent = t.summaryLabel4;
+            document.getElementById('summaryLabel5').textContent = t.summaryLabel5;
+            
+            // Labels
+            document.getElementById('labelDate').textContent = t.labelDate;
+            document.getElementById('labelTime').textContent = t.labelTime;
+            document.getElementById('labelSuggested').textContent = t.labelSuggested;
+            document.getElementById('labelPinDuration').textContent = t.labelPinDuration;
+            document.getElementById('durationLabel').textContent = t.durationLabel;
+            
+            // Button
+            document.getElementById('btnText').textContent = t.btnTextIncomplete;
+        }
+
+        applyTranslations();
+
+        // Toggle help tooltip
+        function toggleHelp(helpId) {
+            const help = document.getElementById(helpId);
+            help.classList.toggle('show');
+        }
+
+        // Select option
+        function selectOption(criterion, value, card) {
+            // Remove selection from siblings
+            const parent = card.parentElement;
+            parent.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+            
+            // Add selection to clicked card
+            card.classList.add('selected');
+            
+            // Update selection state
+            selections[criterion] = value;
+            
+            // Handle special cases
+            if (criterion === 'publicationTime') {
+                const timePicker = document.getElementById('timePicker');
+                if (value === 'scheduled') {
+                    timePicker.classList.add('show');
+                    // Set default date to tomorrow
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    document.getElementById('scheduleDate').value = tomorrow.toISOString().split('T')[0];
+                    document.getElementById('scheduleTime').value = '09:00';
+                    selections.scheduleDate = tomorrow.toISOString().split('T')[0];
+                    selections.scheduleTime = '09:00';
+                } else {
+                    timePicker.classList.remove('show');
+                    selections.scheduleDate = null;
+                    selections.scheduleTime = null;
+                }
+            }
+            
+            if (criterion === 'pinning') {
+                const pinDurationPicker = document.getElementById('pinDurationPicker');
+                if (value === 'yes') {
+                    pinDurationPicker.classList.add('show');
+                    selections.pinDuration = '3'; // default
+                } else {
+                    pinDurationPicker.classList.remove('show');
+                    selections.pinDuration = null;
+                }
+            }
+            
+            // Mark section as completed
+            const section = document.getElementById('criterion' + getCriterionNumber(criterion));
+            section.classList.add('completed');
+            section.classList.remove('active');
+            
+            // Update progress
+            updateProgress();
+            
+            // Scroll to next criterion
+            scrollToNextCriterion(criterion);
+            
+            // Update summary
+            updateSummary();
+        }
+
+        // Get criterion number
+        function getCriterionNumber(criterion) {
+            const map = {
+                'placementType': '1',
+                'publicationTime': '2',
+                'pinning': '3',
+                'adFormat': '4',
+                'visibilityDuration': '5'
+            };
+            return map[criterion];
+        }
+
+        // Scroll to next criterion
+        function scrollToNextCriterion(currentCriterion) {
+            const criteriaOrder = ['placementType', 'publicationTime', 'pinning', 'adFormat', 'visibilityDuration'];
+            const currentIndex = criteriaOrder.indexOf(currentCriterion);
+            
+            if (currentIndex < criteriaOrder.length - 1) {
+                const nextCriterion = criteriaOrder[currentIndex + 1];
+                const nextSection = document.querySelector(`[data-criterion="${nextCriterion}"]`);
+                
+                // Mark next as active
+                nextSection.classList.add('active');
+                
+                // Smooth scroll with offset for sticky header
+                setTimeout(() => {
+                    nextSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+        }
+
+        // Update progress
+        function updateProgress() {
+            let completed = 0;
+            const total = 5;
+            
+            if (selections.placementType) completed++;
+            if (selections.publicationTime) completed++;
+            if (selections.pinning) completed++;
+            if (selections.adFormat) completed++;
+            if (selections.visibilityDuration) completed++;
+            
+            const percentage = (completed / total) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressCount').textContent = `${completed}/${total}`;
+            
+            // Enable submit button if all selected
+            const submitBtn = document.getElementById('submitBtn');
+            const t = translations[lang];
+            
+            if (completed === total) {
+                submitBtn.disabled = false;
+                document.getElementById('btnText').textContent = t.btnTextComplete;
+                document.getElementById('summarySection').classList.add('show');
+            } else {
+                submitBtn.disabled = true;
+                document.getElementById('btnText').textContent = t.btnTextIncomplete;
+            }
+        }
+
+        // Update duration
+        function updateDuration(value) {
+            selections.visibilityDuration = parseInt(value);
+            document.getElementById('durationValue').textContent = value;
+            
+            // Mark as completed
+            const section = document.getElementById('criterion5');
+            section.classList.add('completed');
+            
+            updateProgress();
+            updateSummary();
+        }
+
+        // Set suggested time
+        function setSuggestedTime(time) {
+            document.getElementById('scheduleTime').value = time;
+            selections.scheduleTime = time;
+            updateSummary();
+        }
+
+        // Set pin duration
+        function setPinDuration(days) {
+            selections.pinDuration = days;
+            // Highlight selected chip
+            const chips = document.querySelectorAll('#pinDurationPicker .time-chip');
+            chips.forEach(chip => {
+                if (chip.textContent.includes(days)) {
+                    chip.style.background = 'var(--accent-blue)';
+                    chip.style.borderColor = 'var(--accent-blue)';
+                    chip.style.color = 'white';
+                } else {
+                    chip.style.background = 'var(--bg-secondary)';
+                    chip.style.borderColor = 'var(--border-color)';
+                    chip.style.color = 'var(--text-primary)';
+                }
+            });
+            updateSummary();
+        }
+
+        // Update summary
+        function updateSummary() {
+            const t = translations[lang];
+            
+            // Placement type
+            if (selections.placementType) {
+                const value = selections.placementType === 'onetime' ? t.placementOneTime : t.placementSubscription;
+                document.getElementById('summaryValue1').textContent = value;
+            }
+            
+            // Publication time
+            if (selections.publicationTime) {
+                let value = t.pubTimeImmediate;
+                if (selections.publicationTime === 'scheduled' && selections.scheduleDate && selections.scheduleTime) {
+                    value = `${selections.scheduleDate} ${selections.scheduleTime}`;
+                }
+                document.getElementById('summaryValue2').textContent = value;
+            }
+            
+            // Pinning
+            if (selections.pinning) {
+                let value = t.pinNo;
+                if (selections.pinning === 'yes' && selections.pinDuration) {
+                    value = `${t.pinYes} (${selections.pinDuration} ${t.durationLabel})`;
+                }
+                document.getElementById('summaryValue3').textContent = value;
+            }
+            
+            // Format
+            if (selections.adFormat) {
+                const formatMap = {
+                    'text': t.formatText,
+                    'image': t.formatImage,
+                    'video': t.formatVideo,
+                    'combined': t.formatCombined
+                };
+                document.getElementById('summaryValue4').textContent = formatMap[selections.adFormat];
+            }
+            
+            // Duration
+            if (selections.visibilityDuration) {
+                document.getElementById('summaryValue5').textContent = `${selections.visibilityDuration} ${t.durationLabel}`;
+            }
+        }
+
+        // Submit criteria
+        function submitCriteria() {
+            // Validate date/time inputs if scheduled
+            if (selections.publicationTime === 'scheduled') {
+                selections.scheduleDate = document.getElementById('scheduleDate').value;
+                selections.scheduleTime = document.getElementById('scheduleTime').value;
+            }
+            
+            // Send data to bot
+            tg.sendData(JSON.stringify(selections));
+        }
+
+        // Set theme colors
+        tg.setHeaderColor('#1a1d29');
+        tg.setBackgroundColor('#1a1d29');
+    </script>
+</body>
+</html>
