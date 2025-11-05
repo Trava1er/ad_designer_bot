@@ -1,0 +1,247 @@
+{
+  "tariffs": {
+    "basic": {
+      "name": {
+        "ru": "Базовый",
+        "en": "Basic",
+        "zh-tw": "基本"
+      },
+      "description": {
+        "ru": "Для тестирования платформы",
+        "en": "For platform testing",
+        "zh-tw": "用於平台測試"
+      },
+      "prices": {
+        "RUB": 500,
+        "USD": 6,
+        "CNY": 40
+      },
+      "included_features": [
+        "single_channel",
+        "basic_analytics",
+        "standard_support"
+      ],
+      "channels_limit": 1,
+      "ads_limit": 1,
+      "badge_color": "#4a90e2"
+    },
+    "standard": {
+      "name": {
+        "ru": "Стандарт",
+        "en": "Standard",
+        "zh-tw": "標準"
+      },
+      "description": {
+        "ru": "Оптимальный выбор для роста",
+        "en": "Optimal choice for growth",
+        "zh-tw": "增長的最佳選擇"
+      },
+      "prices": {
+        "RUB": 1200,
+        "USD": 14,
+        "CNY": 95
+      },
+      "included_features": [
+        "multiple_channels",
+        "basic_analytics",
+        "priority_support",
+        "pinning_3days",
+        "scheduling"
+      ],
+      "channels_limit": 3,
+      "ads_limit": 3,
+      "badge_color": "#faad14"
+    },
+    "premium": {
+      "name": {
+        "ru": "Премиум",
+        "en": "Premium",
+        "zh-tw": "高級"
+      },
+      "description": {
+        "ru": "Максимум возможностей",
+        "en": "Maximum capabilities",
+        "zh-tw": "最大功能"
+      },
+      "prices": {
+        "RUB": 2500,
+        "USD": 30,
+        "CNY": 200
+      },
+      "included_features": [
+        "unlimited_channels",
+        "advanced_analytics",
+        "vip_support",
+        "pinning_7days",
+        "scheduling",
+        "auto_promotion",
+        "combined_format",
+        "extended_duration"
+      ],
+      "channels_limit": 999,
+      "ads_limit": 999,
+      "badge_color": "#9254de"
+    }
+  },
+  "additional_services": {
+    "pinning_1day": {
+      "name": {
+        "ru": "Закрепление на 1 день",
+        "en": "Pin for 1 day",
+        "zh-tw": "置頂 1 天"
+      },
+      "prices": {
+        "RUB": 100,
+        "USD": 1,
+        "CNY": 7
+      },
+      "icon": "📍",
+      "included_in": []
+    },
+    "pinning_3days": {
+      "name": {
+        "ru": "Закрепление на 3 дня",
+        "en": "Pin for 3 days",
+        "zh-tw": "置頂 3 天"
+      },
+      "prices": {
+        "RUB": 250,
+        "USD": 3,
+        "CNY": 20
+      },
+      "icon": "📍",
+      "included_in": ["standard", "premium"]
+    },
+    "pinning_7days": {
+      "name": {
+        "ru": "Закрепление на 7 дней",
+        "en": "Pin for 7 days",
+        "zh-tw": "置頂 7 天"
+      },
+      "prices": {
+        "RUB": 500,
+        "USD": 6,
+        "CNY": 40
+      },
+      "icon": "📍",
+      "included_in": ["premium"]
+    },
+    "scheduling": {
+      "name": {
+        "ru": "Отложенная публикация",
+        "en": "Scheduled posting",
+        "zh-tw": "定時發布"
+      },
+      "prices": {
+        "RUB": 150,
+        "USD": 2,
+        "CNY": 12
+      },
+      "icon": "⏰",
+      "included_in": ["standard", "premium"]
+    },
+    "video_format": {
+      "name": {
+        "ru": "Видео формат",
+        "en": "Video format",
+        "zh-tw": "視頻格式"
+      },
+      "prices": {
+        "RUB": 200,
+        "USD": 2,
+        "CNY": 15
+      },
+      "icon": "🎬",
+      "included_in": []
+    },
+    "combined_format": {
+      "name": {
+        "ru": "Комбинированный формат",
+        "en": "Combined format",
+        "zh-tw": "組合格式"
+      },
+      "prices": {
+        "RUB": 300,
+        "USD": 4,
+        "CNY": 25
+      },
+      "icon": "📱",
+      "included_in": ["premium"]
+    },
+    "extended_duration": {
+      "name": {
+        "ru": "Размещение 60+ дней",
+        "en": "60+ days placement",
+        "zh-tw": "60+ 天投放"
+      },
+      "prices": {
+        "RUB": 400,
+        "USD": 5,
+        "CNY": 30
+      },
+      "icon": "⏳",
+      "included_in": ["premium"]
+    },
+    "auto_promotion": {
+      "name": {
+        "ru": "Автопродвижение",
+        "en": "Auto promotion",
+        "zh-tw": "自動推廣"
+      },
+      "prices": {
+        "RUB": 800,
+        "USD": 10,
+        "CNY": 65
+      },
+      "icon": "🚀",
+      "included_in": ["premium"]
+    }
+  },
+  "features_description": {
+    "single_channel": {
+      "ru": "1 канал размещения",
+      "en": "1 channel placement",
+      "zh-tw": "1 個頻道投放"
+    },
+    "multiple_channels": {
+      "ru": "До 3 каналов",
+      "en": "Up to 3 channels",
+      "zh-tw": "最多 3 個頻道"
+    },
+    "unlimited_channels": {
+      "ru": "Без ограничений каналов",
+      "en": "Unlimited channels",
+      "zh-tw": "無限頻道"
+    },
+    "basic_analytics": {
+      "ru": "Базовая аналитика",
+      "en": "Basic analytics",
+      "zh-tw": "基本分析"
+    },
+    "advanced_analytics": {
+      "ru": "Расширенная аналитика",
+      "en": "Advanced analytics",
+      "zh-tw": "高級分析"
+    },
+    "standard_support": {
+      "ru": "Стандартная поддержка",
+      "en": "Standard support",
+      "zh-tw": "標準支持"
+    },
+    "priority_support": {
+      "ru": "Приоритетная поддержка",
+      "en": "Priority support",
+      "zh-tw": "優先支持"
+    },
+    "vip_support": {
+      "ru": "VIP поддержка 24/7",
+      "en": "VIP support 24/7",
+      "zh-tw": "VIP 24/7 支持"
+    }
+  },
+  "currency_symbols": {
+    "RUB": "₽",
+    "USD": "$",
+    "CNY": "¥"
+  }
+}

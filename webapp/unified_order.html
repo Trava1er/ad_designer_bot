@@ -1023,6 +1023,36 @@
         const urlParams = new URLSearchParams(window.location.search);
         const userLang = urlParams.get('lang') || 'ru';
 
+        // Pricing configuration - will be loaded from JSON
+        let pricingConfig = null;
+        
+        // Load pricing configuration
+        async function loadPricingConfig() {
+            try {
+                const response = await fetch('pricing_config.json');
+                pricingConfig = await response.json();
+                initializePage();
+            } catch (error) {
+                console.error('Failed to load pricing config:', error);
+                // Fallback to hardcoded config if fetch fails
+                pricingConfig = getDefaultConfig();
+                initializePage();
+            }
+        }
+
+        function getDefaultConfig() {
+            // Fallback configuration
+            return {
+                "tariffs": {
+                    "basic": { "prices": { "RUB": 500, "USD": 6, "CNY": 40 } },
+                    "standard": { "prices": { "RUB": 1200, "USD": 14, "CNY": 95 } },
+                    "premium": { "prices": { "RUB": 2500, "USD": 30, "CNY": 200 } }
+                },
+                "additional_services": {},
+                "currency_symbols": { "RUB": "₽", "USD": "$", "CNY": "¥" }
+            };
+        }
+
         // Translation data
         const translations = {
             ru: {
